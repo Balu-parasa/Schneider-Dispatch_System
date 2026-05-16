@@ -46,6 +46,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { ThemeToggleCompact } from "@/components/theme-toggle"
 
 // Realtime Data Simulation
 const generateRealtimeData = () => ({
@@ -129,9 +130,9 @@ export default function AdminDashboard() {
   }, [])
 
   return (
-    <div className="h-screen bg-[#0a0a0f] text-white overflow-hidden flex">
+    <div className="h-screen bg-background text-foreground overflow-hidden flex">
       {/* Minimal Left Sidebar */}
-      <aside className="w-16 flex flex-col items-center py-4 border-r border-white/[0.06] bg-[#0a0a0f]">
+      <aside className="w-16 flex flex-col items-center py-4 border-r border-border/50 bg-sidebar">
         <Link href="/" className="mb-8">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
             <Zap className="w-5 h-5 text-white" />
@@ -145,8 +146,8 @@ export default function AdminDashboard() {
               className={cn(
                 "relative w-10 h-10 rounded-xl flex items-center justify-center transition-all",
                 item.active 
-                  ? "bg-white/10 text-white" 
-                  : "text-white/40 hover:text-white/70 hover:bg-white/[0.04]"
+                  ? "bg-primary/10 text-foreground" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               )}
             >
               <item.icon className="w-[18px] h-[18px]" />
@@ -159,7 +160,7 @@ export default function AdminDashboard() {
           ))}
         </nav>
 
-        <button className="w-10 h-10 rounded-xl text-white/40 hover:text-white/70 hover:bg-white/[0.04] flex items-center justify-center transition-all">
+        <button className="w-10 h-10 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 flex items-center justify-center transition-all">
           <LogOut className="w-[18px] h-[18px]" />
         </button>
       </aside>
@@ -167,9 +168,9 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
-        <header className="h-14 flex items-center justify-between px-6 border-b border-white/[0.06] bg-[#0a0a0f]/80 backdrop-blur-xl shrink-0">
+        <header className="h-14 flex items-center justify-between px-6 border-b border-border/50 bg-background/80 backdrop-blur-xl shrink-0">
           <div className="flex items-center gap-6">
-            <h1 className="text-[15px] font-semibold text-white">Command Center</h1>
+            <h1 className="text-[15px] font-semibold text-foreground">Command Center</h1>
             
             <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
               <LiveDot />
@@ -181,11 +182,11 @@ export default function AdminDashboard() {
             {/* Search */}
             <button 
               onClick={() => setShowSearch(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] transition-colors"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
             >
-              <Search className="w-4 h-4 text-white/40" />
-              <span className="text-sm text-white/40">Search...</span>
-              <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/[0.06] text-[10px] text-white/30">
+              <Search className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Search...</span>
+              <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-muted text-[10px] text-muted-foreground">
                 <Command className="w-2.5 h-2.5" />K
               </kbd>
             </button>
@@ -195,29 +196,32 @@ export default function AdminDashboard() {
               <Bot className="w-4 h-4 text-violet-400" />
             </button>
 
+            {/* Theme Toggle */}
+            <ThemeToggleCompact />
+
             {/* Notifications */}
-            <button className="relative w-8 h-8 rounded-lg hover:bg-white/[0.04] flex items-center justify-center transition-colors">
-              <Bell className="w-4 h-4 text-white/50" />
+            <button className="relative w-8 h-8 rounded-lg hover:bg-secondary/50 flex items-center justify-center transition-colors">
+              <Bell className="w-4 h-4 text-muted-foreground" />
               <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-blue-500" />
             </button>
 
             {/* Time */}
-            <div className="text-sm font-mono text-white/50 tabular-nums">
+            <div className="text-sm font-mono text-muted-foreground tabular-nums">
               {formatTime(currentTime)}
             </div>
 
             {/* Profile */}
-            <div className="flex items-center gap-2 pl-3 border-l border-white/[0.06]">
+            <div className="flex items-center gap-2 pl-3 border-l border-border/50">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
                 <Shield className="w-3.5 h-3.5 text-white" />
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-white/30" />
+              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
             </div>
           </div>
         </header>
 
         {/* Stats Bar */}
-        <div className="h-12 flex items-center gap-8 px-6 border-b border-white/[0.06] bg-[#0a0a0f]/50 shrink-0">
+        <div className="h-12 flex items-center gap-8 px-6 border-b border-border/50 bg-card/50 shrink-0">
           {[
             { label: "Active Techs", value: stats.activeTechnicians, icon: Users, color: "text-blue-400" },
             { label: "Live Jobs", value: stats.activeJobs, icon: Activity, color: "text-cyan-400" },
@@ -229,8 +233,8 @@ export default function AdminDashboard() {
           ].map((stat) => (
             <div key={stat.label} className="flex items-center gap-2">
               <stat.icon className={cn("w-4 h-4", stat.color)} />
-              <span className="text-sm font-semibold text-white tabular-nums">{stat.value}</span>
-              <span className="text-xs text-white/40">{stat.label}</span>
+              <span className="text-sm font-semibold text-foreground tabular-nums">{stat.value}</span>
+              <span className="text-xs text-muted-foreground">{stat.label}</span>
             </div>
           ))}
         </div>
@@ -247,15 +251,15 @@ export default function AdminDashboard() {
             
             {/* Map Header */}
             <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-black/60 backdrop-blur-md border border-white/[0.08]">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg glass-card">
                 <Radio className="w-4 h-4 text-blue-400" />
-                <span className="text-xs font-medium text-white">Live Fleet</span>
-                <span className="text-xs text-white/40">
+                <span className="text-xs font-medium text-foreground">Live Fleet</span>
+                <span className="text-xs text-muted-foreground">
                   {techniciansOnline.length} active
                 </span>
               </div>
 
-              <div className="flex items-center gap-4 px-3 py-2 rounded-lg bg-black/60 backdrop-blur-md border border-white/[0.08]">
+              <div className="flex items-center gap-4 px-3 py-2 rounded-lg glass-card">
                 {[
                   { color: "bg-emerald-500", label: "Available" },
                   { color: "bg-amber-500", label: "Busy" },
@@ -264,7 +268,7 @@ export default function AdminDashboard() {
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-1.5">
                     <div className={cn("w-2 h-2 rounded-full", item.color)} />
-                    <span className="text-[11px] text-white/50">{item.label}</span>
+                    <span className="text-[11px] text-muted-foreground">{item.label}</span>
                   </div>
                 ))}
               </div>
@@ -293,7 +297,7 @@ export default function AdminDashboard() {
                 style={{ left: `${zone.x}%`, top: `${zone.y}%`, width: `${zone.w}%`, height: `${zone.h}%` }}
               >
                 <div className="absolute left-2 top-2 flex items-center gap-2">
-                  <span className="text-[11px] font-medium text-white/70">{zone.name}</span>
+                  <span className="text-[11px] font-medium text-foreground/70">{zone.name}</span>
                   <span className={cn(
                     "text-[10px] font-semibold px-1.5 py-0.5 rounded",
                     zone.demand === "high" ? "bg-red-500/20 text-red-400" :
@@ -326,7 +330,7 @@ export default function AdminDashboard() {
                     "w-7 h-7 rounded-full flex items-center justify-center transition-all shadow-lg",
                     tech.status === "busy" ? "bg-amber-500" :
                     tech.status === "available" ? "bg-emerald-500" : "bg-blue-500",
-                    selectedTech === tech.id && "ring-2 ring-white ring-offset-2 ring-offset-[#0a0a0f] scale-110"
+                    selectedTech === tech.id && "ring-2 ring-white ring-offset-2 ring-offset-background scale-110"
                   )}>
                     <User className="w-3.5 h-3.5 text-white" />
                   </div>
@@ -337,11 +341,11 @@ export default function AdminDashboard() {
                         initial={{ opacity: 0, y: 8, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                        className="absolute left-10 top-0 w-52 rounded-xl bg-[#12121a] border border-white/[0.08] p-3 shadow-2xl z-30"
+                        className="absolute left-10 top-0 w-52 rounded-xl bg-card border border-border p-3 shadow-2xl z-30"
                       >
                         <button 
                           onClick={(e) => { e.stopPropagation(); setSelectedTech(null) }}
-                          className="absolute right-2 top-2 w-5 h-5 rounded-full bg-white/[0.06] flex items-center justify-center text-white/40 hover:text-white transition-colors"
+                          className="absolute right-2 top-2 w-5 h-5 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -359,8 +363,8 @@ export default function AdminDashboard() {
                             )} />
                           </div>
                           <div>
-                            <div className="text-sm font-medium text-white">{tech.name}</div>
-                            <div className="flex items-center gap-1.5 text-xs text-white/50">
+                            <div className="text-sm font-medium text-foreground">{tech.name}</div>
+                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                               <span>{tech.specialty}</span>
                               <span className="flex items-center gap-0.5 text-amber-400">
                                 <Star className="w-3 h-3 fill-amber-400" />
@@ -371,19 +375,19 @@ export default function AdminDashboard() {
                         </div>
                         
                         {tech.currentJob && (
-                          <div className="text-xs bg-white/[0.04] rounded-lg px-2.5 py-2 mb-3 border border-white/[0.06]">
-                            <span className="text-white/50">Current: </span>
-                            <span className="text-white font-medium">{tech.currentJob}</span>
+                          <div className="text-xs bg-secondary rounded-lg px-2.5 py-2 mb-3 border border-border">
+                            <span className="text-muted-foreground">Current: </span>
+                            <span className="text-foreground font-medium">{tech.currentJob}</span>
                             {tech.eta && <span className="text-blue-400 ml-1.5">ETA {tech.eta}</span>}
                           </div>
                         )}
                         
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline" className="flex-1 h-8 text-xs bg-white/[0.04] border-white/[0.08] hover:bg-white/[0.08]">
+                          <Button size="sm" variant="outline" className="flex-1 h-8 text-xs bg-secondary border-border hover:bg-muted">
                             <Phone className="w-3 h-3 mr-1.5" />
                             Call
                           </Button>
-                          <Button size="sm" variant="outline" className="flex-1 h-8 text-xs bg-white/[0.04] border-white/[0.08] hover:bg-white/[0.08]">
+                          <Button size="sm" variant="outline" className="flex-1 h-8 text-xs bg-secondary border-border hover:bg-muted">
                             <MessageSquare className="w-3 h-3 mr-1.5" />
                             Message
                           </Button>
@@ -420,11 +424,11 @@ export default function AdminDashboard() {
                 { label: "Utilization", value: `${stats.utilization}%`, trend: "+5%", up: true, icon: Activity },
                 { label: "Satisfaction", value: stats.satisfaction, trend: "+0.2", up: true, icon: Star },
               ].map((metric) => (
-                <div key={metric.label} className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-black/60 backdrop-blur-md border border-white/[0.08]">
-                  <metric.icon className="w-4 h-4 text-white/40" />
+                <div key={metric.label} className="flex items-center gap-3 px-4 py-2.5 rounded-lg glass-card">
+                  <metric.icon className="w-4 h-4 text-muted-foreground" />
                   <div>
-                    <div className="text-sm font-semibold text-white tabular-nums">{metric.value}</div>
-                    <div className="text-[10px] text-white/40">{metric.label}</div>
+                    <div className="text-sm font-semibold text-foreground tabular-nums">{metric.value}</div>
+                    <div className="text-[10px] text-muted-foreground">{metric.label}</div>
                   </div>
                   <div className={cn("flex items-center gap-0.5 text-[11px] font-medium", metric.up ? "text-emerald-400" : "text-red-400")}>
                     {metric.up ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
@@ -436,13 +440,13 @@ export default function AdminDashboard() {
           </div>
 
           {/* Right Panel */}
-          <aside className="w-80 border-l border-white/[0.06] bg-[#0a0a0f] flex flex-col shrink-0">
+          <aside className="w-80 border-l border-border/50 bg-sidebar flex flex-col shrink-0">
             {/* Live Dispatch */}
-            <div className="flex-1 flex flex-col border-b border-white/[0.06] min-h-0">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+            <div className="flex-1 flex flex-col border-b border-border/50 min-h-0">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
                 <div className="flex items-center gap-2">
                   <Radio className="w-4 h-4 text-cyan-400" />
-                  <span className="text-sm font-medium text-white">Live Dispatch</span>
+                  <span className="text-sm font-medium text-foreground">Live Dispatch</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <LiveDot />
@@ -461,7 +465,7 @@ export default function AdminDashboard() {
                       "flex items-center gap-3 rounded-lg p-2.5 mb-1.5 transition-colors cursor-pointer",
                       dispatch.priority === "emergency" 
                         ? "bg-red-500/10 hover:bg-red-500/15" 
-                        : "hover:bg-white/[0.03]"
+                        : "hover:bg-secondary/50"
                     )}
                   >
                     <div className={cn(
@@ -475,12 +479,12 @@ export default function AdminDashboard() {
                     
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-medium text-white">{dispatch.technician}</span>
-                        <ChevronRight className="w-3 h-3 text-white/30" />
-                        <span className="text-xs text-white/50 truncate">{dispatch.customer}</span>
+                        <span className="text-xs font-medium text-foreground">{dispatch.technician}</span>
+                        <ChevronRight className="w-3 h-3 text-muted-foreground/50" />
+                        <span className="text-xs text-muted-foreground truncate">{dispatch.customer}</span>
                       </div>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-[11px] text-white/40">{dispatch.service}</span>
+                        <span className="text-[11px] text-muted-foreground">{dispatch.service}</span>
                         {dispatch.priority === "emergency" && (
                           <span className="text-[9px] font-bold text-red-400 bg-red-500/20 px-1.5 py-0.5 rounded">EMERGENCY</span>
                         )}
@@ -495,7 +499,7 @@ export default function AdminDashboard() {
                       )}>
                         {dispatch.status === "en-route" ? `ETA ${dispatch.eta}` : dispatch.status}
                       </div>
-                      <div className="text-[10px] text-white/30 mt-0.5">{dispatch.time}</div>
+                      <div className="text-[10px] text-muted-foreground/60 mt-0.5">{dispatch.time}</div>
                     </div>
                   </motion.div>
                 ))}
@@ -503,11 +507,11 @@ export default function AdminDashboard() {
             </div>
 
             {/* Emergency Queue */}
-            <div className="border-b border-white/[0.06]">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+            <div className="border-b border-border/50">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-red-400" />
-                  <span className="text-sm font-medium text-white">Emergencies</span>
+                  <span className="text-sm font-medium text-foreground">Emergencies</span>
                 </div>
                 <span className="w-5 h-5 rounded-full bg-red-500 text-[11px] font-bold flex items-center justify-center animate-pulse">
                   {emergencyQueue.length}
@@ -535,10 +539,10 @@ export default function AdminDashboard() {
                           )}>
                             {emergency.severity}
                           </span>
-                          <span className="text-[10px] text-white/40">{emergency.time} ago</span>
+                          <span className="text-[10px] text-muted-foreground">{emergency.time} ago</span>
                         </div>
-                        <p className="text-xs font-medium text-white">{emergency.issue}</p>
-                        <p className="text-[11px] text-white/40 flex items-center gap-1 mt-0.5">
+                        <p className="text-xs font-medium text-foreground">{emergency.issue}</p>
+                        <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
                           <MapPin className="w-3 h-3" />
                           {emergency.location}
                         </p>
@@ -554,10 +558,10 @@ export default function AdminDashboard() {
 
             {/* AI Insights */}
             <div className="flex-1 flex flex-col min-h-0">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-violet-400" />
-                  <span className="text-sm font-medium text-white">AI Insights</span>
+                  <span className="text-sm font-medium text-foreground">AI Insights</span>
                 </div>
                 <span className="text-[10px] text-violet-400 bg-violet-500/15 px-2 py-0.5 rounded-full font-medium">
                   {aiInsights.length} new
@@ -571,7 +575,7 @@ export default function AdminDashboard() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 + i * 0.05 }}
-                    className="rounded-lg bg-white/[0.02] border border-white/[0.06] p-3 hover:border-violet-500/30 transition-all cursor-pointer"
+                    className="rounded-lg bg-secondary/50 border border-border p-3 hover:border-violet-500/30 transition-all cursor-pointer"
                   >
                     <div className="flex items-start gap-2.5 mb-2.5">
                       <div className={cn(
@@ -584,12 +588,12 @@ export default function AdminDashboard() {
                         {insight.type === "optimization" && <Navigation className="w-3 h-3" />}
                         {insight.type === "alert" && <AlertTriangle className="w-3 h-3" />}
                       </div>
-                      <p className="text-xs text-white/80 leading-relaxed">{insight.message}</p>
+                      <p className="text-xs text-foreground/80 leading-relaxed">{insight.message}</p>
                     </div>
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="h-1 w-14 rounded-full bg-white/[0.06] overflow-hidden">
+                        <div className="h-1 w-14 rounded-full bg-muted overflow-hidden">
                           <motion.div 
                             initial={{ width: 0 }}
                             animate={{ width: `${insight.confidence}%` }}
@@ -597,7 +601,7 @@ export default function AdminDashboard() {
                             className="h-full bg-gradient-to-r from-violet-500 to-blue-500 rounded-full" 
                           />
                         </div>
-                        <span className="text-[10px] text-white/40">{insight.confidence}%</span>
+                        <span className="text-[10px] text-muted-foreground">{insight.confidence}%</span>
                       </div>
                       <button className="text-[11px] text-violet-400 hover:text-violet-300 font-medium flex items-center gap-1">
                         Apply
@@ -620,27 +624,27 @@ export default function AdminDashboard() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50"
+              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50"
               onClick={() => setShowSearch(false)}
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: -20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -20 }}
-              className="fixed top-24 left-1/2 -translate-x-1/2 w-full max-w-lg bg-[#12121a] border border-white/[0.08] rounded-xl shadow-2xl z-50 overflow-hidden"
+              className="fixed top-24 left-1/2 -translate-x-1/2 w-full max-w-lg bg-card border border-border rounded-xl shadow-2xl z-50 overflow-hidden"
             >
-              <div className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.06]">
-                <Search className="w-5 h-5 text-white/40" />
+              <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+                <Search className="w-5 h-5 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Search technicians, customers, jobs..."
-                  className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none"
+                  className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
                   autoFocus
                 />
-                <kbd className="text-[10px] text-white/30 bg-white/[0.06] px-1.5 py-0.5 rounded">ESC</kbd>
+                <kbd className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">ESC</kbd>
               </div>
               <div className="p-2">
-                <div className="text-[10px] font-medium text-white/30 uppercase tracking-wider px-2 py-1.5">Quick Actions</div>
+                <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider px-2 py-1.5">Quick Actions</div>
                 {[
                   { icon: Users, label: "View all technicians", shortcut: "T" },
                   { icon: AlertTriangle, label: "Emergency dispatch", shortcut: "E" },
@@ -648,11 +652,11 @@ export default function AdminDashboard() {
                 ].map((action) => (
                   <button
                     key={action.label}
-                    className="flex items-center gap-3 w-full rounded-lg px-3 py-2.5 hover:bg-white/[0.04] transition-colors"
+                    className="flex items-center gap-3 w-full rounded-lg px-3 py-2.5 hover:bg-secondary transition-colors"
                   >
-                    <action.icon className="w-4 h-4 text-white/40" />
-                    <span className="text-sm text-white flex-1 text-left">{action.label}</span>
-                    <kbd className="text-[10px] text-white/30 bg-white/[0.06] px-1.5 py-0.5 rounded">{action.shortcut}</kbd>
+                    <action.icon className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm text-foreground flex-1 text-left">{action.label}</span>
+                    <kbd className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">{action.shortcut}</kbd>
                   </button>
                 ))}
               </div>
