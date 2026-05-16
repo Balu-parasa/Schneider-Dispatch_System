@@ -6,7 +6,8 @@
 /* ============================================
    PREMIUM LIGHT MODE - Inspired by Linear, Stripe, Apple
    ============================================ */
-:root {
+:root,
+html:not(.dark) {
   /* Premium Light Theme - Elegant, Airy, Modern SaaS */
   --background: oklch(0.98 0.005 260);
   --foreground: oklch(0.12 0.02 260);
@@ -50,6 +51,7 @@
 /* ============================================
    DARK MODE - Preserved exactly as original
    ============================================ */
+html.dark,
 .dark {
   /* Futuristic Dark Theme - Schneider Smart Service Platform */
   --background: oklch(0.13 0.02 260);
@@ -191,15 +193,18 @@
 }
 
 /* Dark mode scrollbar */
-.dark::-webkit-scrollbar-track {
+html.dark::-webkit-scrollbar-track,
+.dark ::-webkit-scrollbar-track {
   background: oklch(0.14 0.02 260);
 }
 
-.dark::-webkit-scrollbar-thumb {
+html.dark::-webkit-scrollbar-thumb,
+.dark ::-webkit-scrollbar-thumb {
   background: oklch(0.30 0.02 260);
 }
 
-.dark::-webkit-scrollbar-thumb:hover {
+html.dark::-webkit-scrollbar-thumb:hover,
+.dark ::-webkit-scrollbar-thumb:hover {
   background: oklch(0.40 0.02 260);
 }
 
@@ -213,6 +218,7 @@
   box-shadow: 0 4px 30px oklch(0.5 0.02 260 / 0.08);
 }
 
+html.dark .glass,
 .dark .glass {
   background: oklch(0.16 0.02 260 / 0.7);
   backdrop-filter: blur(12px);
@@ -233,6 +239,7 @@
     0 4px 20px oklch(0.5 0.02 260 / 0.08);
 }
 
+html.dark .glass-card,
 .dark .glass-card {
   background: linear-gradient(
     135deg,
@@ -252,6 +259,7 @@
     0 1px 3px oklch(0.55 0.2 260 / 0.1);
 }
 
+html.dark .glow-blue,
 .dark .glow-blue {
   box-shadow: 0 0 20px oklch(0.62 0.19 250 / 0.3),
     0 0 40px oklch(0.62 0.19 250 / 0.1);
@@ -262,6 +270,7 @@
     0 1px 3px oklch(0.65 0.17 195 / 0.1);
 }
 
+html.dark .glow-cyan,
 .dark .glow-cyan {
   box-shadow: 0 0 20px oklch(0.72 0.17 195 / 0.3),
     0 0 40px oklch(0.72 0.17 195 / 0.1);
@@ -272,6 +281,7 @@
     0 1px 3px oklch(0.55 0.21 295 / 0.1);
 }
 
+html.dark .glow-purple,
 .dark .glow-purple {
   box-shadow: 0 0 20px oklch(0.62 0.21 295 / 0.3),
     0 0 40px oklch(0.62 0.21 295 / 0.1);
@@ -282,6 +292,7 @@
     0 1px 3px oklch(0.55 0.18 145 / 0.1);
 }
 
+html.dark .glow-green,
 .dark .glow-green {
   box-shadow: 0 0 20px oklch(0.64 0.18 145 / 0.3),
     0 0 40px oklch(0.64 0.18 145 / 0.1);
@@ -294,6 +305,7 @@
   text-shadow: none;
 }
 
+html.dark .text-glow-blue,
 .dark .text-glow-blue {
   text-shadow: 0 0 20px oklch(0.62 0.19 250 / 0.5);
 }
@@ -302,6 +314,7 @@
   text-shadow: none;
 }
 
+html.dark .text-glow-cyan,
 .dark .text-glow-cyan {
   text-shadow: 0 0 20px oklch(0.72 0.17 195 / 0.5);
 }
@@ -317,6 +330,7 @@
   );
 }
 
+html.dark .gradient-radial,
 .dark .gradient-radial {
   background: radial-gradient(
     ellipse at center,
@@ -334,6 +348,7 @@
     radial-gradient(at 0% 100%, oklch(0.55 0.2 260 / 0.05) 0px, transparent 50%);
 }
 
+html.dark .gradient-mesh,
 .dark .gradient-mesh {
   background-image: 
     radial-gradient(at 40% 20%, oklch(0.62 0.19 250 / 0.12) 0px, transparent 50%),
@@ -353,6 +368,7 @@
   background-size: 50px 50px;
 }
 
+html.dark .grid-pattern,
 .dark .grid-pattern {
   background-image: 
     linear-gradient(oklch(0.62 0.19 250 / 0.03) 1px, transparent 1px),
@@ -424,6 +440,7 @@
   animation: shimmer 2s infinite;
 }
 
+html.dark .shimmer,
 .dark .shimmer {
   background: linear-gradient(
     90deg,
@@ -454,6 +471,7 @@
   box-shadow: 0 10px 40px oklch(0.5 0.02 260 / 0.15);
 }
 
+html.dark .hover-lift:hover,
 .dark .hover-lift:hover {
   transform: translateY(-4px);
   box-shadow: 0 10px 40px oklch(0 0 0 / 0.3);
@@ -468,6 +486,7 @@
   box-shadow: 0 4px 30px oklch(0.55 0.2 260 / 0.1);
 }
 
+html.dark .card-hover-glow:hover,
 .dark .card-hover-glow:hover {
   border-color: oklch(0.62 0.19 250 / 0.4);
   box-shadow: 0 0 30px oklch(0.62 0.19 250 / 0.15);
@@ -500,6 +519,7 @@
   animation: scan 3s linear infinite;
 }
 
+html.dark .scan-line::after,
 .dark .scan-line::after {
   background: linear-gradient(90deg, transparent, oklch(0.62 0.19 250), transparent);
 }
@@ -537,6 +557,7 @@
   background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
 }
 
+html.dark .tactical-grid,
 .dark .tactical-grid {
   background-image: 
     linear-gradient(oklch(0.62 0.19 250 / 0.05) 1px, transparent 1px),
@@ -582,6 +603,7 @@
   mask-composite: exclude;
 }
 
+html.dark .gradient-border::before,
 .dark .gradient-border::before {
   background: linear-gradient(135deg, oklch(0.62 0.19 250), oklch(0.72 0.17 195), oklch(0.62 0.21 295));
 }
@@ -603,6 +625,7 @@
   animation: gradient-shift 4s ease infinite;
 }
 
+html.dark .animated-gradient-text,
 .dark .animated-gradient-text {
   background: linear-gradient(90deg, oklch(0.62 0.19 250), oklch(0.72 0.17 195), oklch(0.62 0.21 295), oklch(0.62 0.19 250));
   background-size: 300% 100%;
@@ -627,6 +650,7 @@
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
+html.dark .pulse-glow,
 .dark .pulse-glow {
   animation: pulse-glow-dark 2s ease-in-out infinite;
 }
@@ -680,6 +704,7 @@
   pointer-events: none;
 }
 
+html.dark .noise-overlay::after,
 .dark .noise-overlay::after {
   opacity: 0.03;
 }
@@ -699,6 +724,7 @@
   border: 1px solid oklch(0.94 0.005 260);
 }
 
+html.dark .card-elevated,
 .dark .card-elevated {
   background: oklch(0.16 0.02 260);
   box-shadow: none;
@@ -714,6 +740,7 @@
   );
 }
 
+html.dark .highlight-soft,
 .dark .highlight-soft {
   background: linear-gradient(
     135deg,
@@ -732,6 +759,7 @@
   border: 1px solid oklch(0.94 0.005 260);
 }
 
+html.dark .surface-premium,
 .dark .surface-premium {
   background: linear-gradient(
     180deg,
@@ -746,6 +774,7 @@
   box-shadow: inset 0 1px 2px oklch(0.5 0.02 260 / 0.06);
 }
 
+html.dark .inner-shadow,
 .dark .inner-shadow {
   box-shadow: inset 0 1px 2px oklch(0 0 0 / 0.2);
 }
@@ -762,6 +791,7 @@
   height: 1px;
 }
 
+html.dark .divider-premium,
 .dark .divider-premium {
   background: linear-gradient(
     90deg,
