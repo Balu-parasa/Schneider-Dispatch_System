@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
@@ -82,9 +82,16 @@ export default function LoginPage() {
       window.location.href = redirectPath || redirect || "/customer"
     } catch (err: any) {
       console.error(err)
-      const message = err.response?.data?.errors?.email?.[0] || 
-                      err.response?.data?.message || 
-                      "The provided credentials are incorrect."
+      let message = "The provided credentials are incorrect."
+      if (err.response) {
+        message = err.response.data?.errors?.email?.[0] || 
+                  err.response.data?.message || 
+                  message
+      } else if (err.request) {
+        message = "Cannot connect to the server. Please check if the backend server is running on port 8000."
+      } else {
+        message = err.message || message
+      }
       setErrorMessage(message)
     } finally {
       setIsLoading(false)

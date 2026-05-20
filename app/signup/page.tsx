@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
@@ -106,14 +106,21 @@ export default function SignupPage() {
       window.location.href = redirectPath || redirect || "/customer"
     } catch (err: any) {
       console.error(err)
-      const errors = err.response?.data?.errors
-      let message = err.response?.data?.message || "Registration failed. Please check details."
-      if (errors) {
-        // Collect first error message
-        const firstErrorKey = Object.keys(errors)[0]
-        if (firstErrorKey && errors[firstErrorKey]?.[0]) {
-          message = errors[firstErrorKey][0]
+      let message = "Registration failed. Please check details."
+      if (err.response) {
+        const errors = err.response.data?.errors
+        message = err.response.data?.message || message
+        if (errors) {
+          // Collect first error message
+          const firstErrorKey = Object.keys(errors)[0]
+          if (firstErrorKey && errors[firstErrorKey]?.[0]) {
+            message = errors[firstErrorKey][0]
+          }
         }
+      } else if (err.request) {
+        message = "Cannot connect to the server. Please check if the backend server is running on port 8000."
+      } else {
+        message = err.message || message
       }
       setErrorMessage(message)
     } finally {
