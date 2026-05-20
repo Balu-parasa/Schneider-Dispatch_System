@@ -59,7 +59,7 @@ html:not(.dark) {
    ============================================ */
 html.dark,
 .dark {
-  /* Futuristic Dark Theme - Schneider Smart Service Platform */
+  /* Futuristic Dark Theme - ServiceFlow Smart Service Platform */
   --background: #1e261e;
   --foreground: #FBFBF9;
   --card: #2D3A2D;

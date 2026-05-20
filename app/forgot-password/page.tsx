@@ -18,6 +18,7 @@ import {
   RefreshCw,
   Eye,
   EyeOff,
+  Sparkles,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -55,6 +56,7 @@ export default function ForgotPasswordPage() {
   const [errorMessage, setErrorMessage] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
   const [timer, setTimer] = useState(0)
+  const [otpVerified, setOtpVerified] = useState(false)
   
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
@@ -118,7 +120,7 @@ export default function ForgotPasswordPage() {
     setSuccessMessage("")
     try {
       const response = await api.post("/auth/forgot-password", { email })
-      setSuccessMessage(response.data.message || "A 6-digit verification code has been sent.")
+      setSuccessMessage(response.data.message || "A 6-digit verification code has been sent to your email.")
       setTimer(60) // Start 60s cooldown
       
       // Auto advance to step 2 after a brief delay
@@ -128,8 +130,12 @@ export default function ForgotPasswordPage() {
       }, 1500)
     } catch (err: any) {
       console.error(err)
-      const message = err.response?.data?.message || "Failed to send verification code. Please try again."
-      setErrorMessage(message)
+      if (err.code === "ERR_NETWORK" || !err.response) {
+        setErrorMessage("Cannot connect to the server. Please make sure the backend is running on port 8000.")
+      } else {
+        const message = err.response?.data?.message || "Failed to send verification code. Please try again."
+        setErrorMessage(message)
+      }
     } finally {
       setIsLoading(false)
     }
@@ -146,30 +152,74 @@ export default function ForgotPasswordPage() {
       setSuccessMessage(response.data.message || "A new 6-digit verification code has been sent.")
       setTimer(60)
       setOtpArray(Array(6).fill(""))
+      setOtpVerified(false)
     } catch (err: any) {
       console.error(err)
-      const message = err.response?.data?.message || "Failed to resend verification code."
-      setErrorMessage(message)
+      if (err.code === "ERR_NETWORK" || !err.response) {
+        setErrorMessage("Cannot connect to the server. Please ensure the backend is running.")
+      } else {
+        const message = err.response?.data?.message || "Failed to resend verification code."
+        setErrorMessage(message)
+      }
     } finally {
       setIsLoading(false)
     }
   }
 
-  // Action: Verify OTP locally and proceed to new password
-  const handleVerifyOtp = (e: React.FormEvent) => {
+  // Action: Verify OTP with server (real-time server-side verification)
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault()
     const enteredOtp = otpArray.join("")
     if (enteredOtp.length < 6) {
       setErrorMessage("Please enter the complete 6-digit code.")
       return
     }
+    
+    setIsLoading(true)
     setErrorMessage("")
-    setStep(3)
+    setSuccessMessage("")
+    
+    try {
+      const response = await api.post("/auth/verify-otp", {
+        email,
+        otp: enteredOtp,
+      })
+      
+      if (response.data.verified) {
+        setOtpVerified(true)
+        setSuccessMessage("✅ OTP verified successfully! Setting up your new password...")
+        
+        // Advance to step 3 after showing success
+        setTimeout(() => {
+          setStep(3)
+          setSuccessMessage("")
+          setErrorMessage("")
+        }, 1500)
+      }
+    } catch (err: any) {
+      console.error(err)
+      if (err.code === "ERR_NETWORK" || !err.response) {
+        setErrorMessage("Cannot connect to the server. Please ensure the backend is running.")
+      } else {
+        const message = err.response?.data?.message || "Invalid verification code. Please try again."
+        setErrorMessage(message)
+      }
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   // Action: Reset password completely
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Extra safety: ensure OTP was verified
+    if (!otpVerified) {
+      setErrorMessage("Please verify your OTP first before resetting password.")
+      setStep(2)
+      return
+    }
+    
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match.")
       return
@@ -198,8 +248,12 @@ export default function ForgotPasswordPage() {
       }, 2000)
     } catch (err: any) {
       console.error(err)
-      const message = err.response?.data?.message || "Failed to reset password. Please request a new OTP."
-      setErrorMessage(message)
+      if (err.code === "ERR_NETWORK" || !err.response) {
+        setErrorMessage("Cannot connect to the server. Please ensure the backend is running.")
+      } else {
+        const message = err.response?.data?.message || "Failed to reset password. Please request a new OTP."
+        setErrorMessage(message)
+      }
     } finally {
       setIsLoading(false)
     }
@@ -256,18 +310,25 @@ export default function ForgotPasswordPage() {
                   const Icon = s === 1 ? Mail : s === 2 ? KeyRound : Lock
                   const isActive = step >= s
                   const isCurrent = step === s
+                  const isCompleted = step > s
                   return (
                     <div key={s} className="flex flex-col items-center">
                       <div 
                         className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                          isCurrent 
-                            ? 'bg-primary border-primary text-primary-foreground glow-blue scale-110' 
-                            : isActive 
-                              ? 'bg-background border-primary text-primary shadow-[0_0_10px_rgba(37,99,235,0.2)]' 
-                              : 'bg-background border-muted text-muted-foreground'
+                          isCompleted
+                            ? 'bg-primary/20 border-primary text-primary'
+                            : isCurrent 
+                              ? 'bg-primary border-primary text-primary-foreground glow-blue scale-110' 
+                              : isActive 
+                                ? 'bg-background border-primary text-primary shadow-[0_0_10px_rgba(37,99,235,0.2)]' 
+                                : 'bg-background border-muted text-muted-foreground'
                         }`}
                       >
-                        <Icon className="w-5 h-5" />
+                        {isCompleted ? (
+                          <CheckCircle2 className="w-5 h-5" />
+                        ) : (
+                          <Icon className="w-5 h-5" />
+                        )}
                       </div>
                       <span className={`text-[11px] font-semibold mt-2 transition-colors duration-300 ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>
                         {s === 1 ? "Email" : s === 2 ? "Verify OTP" : "New Password"}
@@ -321,7 +382,7 @@ export default function ForgotPasswordPage() {
                     Forgot Password
                   </h1>
                   <p className="mt-2 text-muted-foreground text-sm">
-                    Enter your registered email address below. We'll send a 6-digit real-time verification OTP to reset your password.
+                    Enter your registered email address below. We&apos;ll send a 6-digit real-time verification OTP to reset your password.
                   </p>
                 </div>
 
@@ -373,7 +434,7 @@ export default function ForgotPasswordPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setStep(1)}
+                      onClick={() => { setStep(1); setErrorMessage(""); setSuccessMessage(""); }}
                       className="p-1 h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground"
                     >
                       <ArrowLeft className="h-4 w-4" />
@@ -405,32 +466,65 @@ export default function ForgotPasswordPage() {
                           value={digit}
                           onChange={(e) => handleOtpChange(e.target.value, index)}
                           onKeyDown={(e) => handleOtpKeyDown(e, index)}
-                          className="w-12 h-14 text-center text-xl font-bold rounded-xl border border-border/80 bg-secondary/30 text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all glow-blue-subtle"
+                          className={`w-12 h-14 text-center text-xl font-bold rounded-xl border bg-secondary/30 text-foreground focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all ${
+                            otpVerified 
+                              ? 'border-success/60 bg-success/10 text-success' 
+                              : 'border-border/80 glow-blue-subtle'
+                          }`}
+                          disabled={otpVerified || isLoading}
                           required
                         />
                       ))}
                     </div>
+
+                    {/* Verified badge */}
+                    {otpVerified && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex items-center justify-center gap-2 text-success text-sm font-semibold"
+                      >
+                        <Sparkles className="h-4 w-4" />
+                        <span>Identity Verified</span>
+                        <Sparkles className="h-4 w-4" />
+                      </motion.div>
+                    )}
                   </div>
 
                   <Button
                     type="submit"
                     className="w-full gap-2 glow-blue h-11 text-base font-semibold"
-                    disabled={isLoading}
+                    disabled={isLoading || otpVerified}
                   >
-                    Verify & Continue
-                    <ArrowRight className="h-4 w-4" />
+                    {isLoading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                        <span>Verifying with server...</span>
+                      </div>
+                    ) : otpVerified ? (
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-5 w-5" />
+                        <span>Verified — Redirecting...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <Shield className="h-4 w-4" />
+                        Verify OTP Code
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    )}
                   </Button>
 
                   {/* Resend Action Area */}
                   <div className="text-center mt-6">
                     <p className="text-sm text-muted-foreground">
-                      Didn't receive the email code?
+                      Didn&apos;t receive the email code?
                     </p>
                     <Button
                       type="button"
                       variant="link"
                       onClick={handleResendOtp}
-                      disabled={timer > 0 || isLoading}
+                      disabled={timer > 0 || isLoading || otpVerified}
                       className="text-primary hover:text-primary/80 font-semibold gap-1.5 mt-1"
                     >
                       <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
@@ -450,11 +544,21 @@ export default function ForgotPasswordPage() {
                 transition={{ duration: 0.25 }}
               >
                 <div>
+                  {/* Verified Badge */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-success/10 border border-success/20 w-fit"
+                  >
+                    <CheckCircle2 className="h-4 w-4 text-success" />
+                    <span className="text-xs font-semibold text-success">Identity Verified via OTP</span>
+                  </motion.div>
+
                   <h1 className="text-3xl font-bold tracking-tight text-foreground">
                     Reset Your Password
                   </h1>
                   <p className="mt-2 text-muted-foreground text-sm">
-                    Identity verified! Choose a strong password to secure your ServiceFlow account.
+                    Choose a strong password to secure your ServiceFlow account.
                   </p>
                 </div>
 
@@ -523,6 +627,22 @@ export default function ForgotPasswordPage() {
                         {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
                     </div>
+                    {/* Password match indicator */}
+                    {confirmPassword && (
+                      <div className={`flex items-center gap-1.5 text-xs mt-1 ${password === confirmPassword ? 'text-success' : 'text-destructive'}`}>
+                        {password === confirmPassword ? (
+                          <>
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            <span>Passwords match</span>
+                          </>
+                        ) : (
+                          <>
+                            <AlertTriangle className="h-3.5 w-3.5" />
+                            <span>Passwords do not match</span>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <Button

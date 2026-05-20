@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Book a Service - Schneider Monolith')
+@section('title', 'Book a Service - ServiceFlow Monolith')
 
 @section('content')
 <div class="min-h-screen pt-24 pb-16" 

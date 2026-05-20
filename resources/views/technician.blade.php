@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Technician Dispatch Control - Schneider')
+@section('title', 'Technician Dispatch Control - ServiceFlow')
 
 @section('content')
 <div class="min-h-screen pt-24 pb-16" 

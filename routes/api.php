@@ -20,6 +20,7 @@ Route::prefix('v1')->group(function () {
         Route::post('register', [AuthController::class, 'register']);
         Route::post('login', [AuthController::class, 'login']);
         Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+        Route::post('verify-otp', [AuthController::class, 'verifyOtp']);
         Route::post('reset-password', [AuthController::class, 'resetPassword']);
 
         Route::middleware('auth:sanctum')->group(function () {
@@ -31,6 +32,7 @@ Route::prefix('v1')->group(function () {
     Route::get('services', [ServiceController::class, 'index']);
     Route::get('technicians', [TechnicianController::class, 'index']);
     Route::get('reviews', [ReviewController::class, 'index']);
+
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('bookings', BookingController::class)->only(['index', 'store', 'show']);

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Sign In - Schneider Dispatch Platform')
+@section('title', 'Sign In - ServiceFlow Dispatch Platform')
 
 @section('content')
 <div class="flex min-h-[90vh] items-stretch">
@@ -15,7 +15,7 @@
                         <i data-lucide="zap" class="h-6 w-6 text-white"></i>
                     </div>
                     <span class="text-xl font-bold text-white group-hover:text-emerald-400 transition-colors">
-                        Schneider
+                        ServiceFlow
                     </span>
                 </a>
             </div>

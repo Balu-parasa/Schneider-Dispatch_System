@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Schneider - Realtime Smart Dispatch & CRM Monolith')
+@section('title', 'ServiceFlow - Realtime Smart Dispatch & CRM Monolith')
 
 @section('content')
 <!-- Hero Section -->

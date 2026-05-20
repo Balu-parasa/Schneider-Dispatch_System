@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Schneider CRM - AI-Powered Dispatch & Fleet Hub</title>
+    <title>ServiceFlow CRM - AI-Powered Dispatch & Fleet Hub</title>
 
     <!-- Tailwind CSS v4 -->
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
@@ -65,7 +65,7 @@
         <iframe 
             src="http://localhost:3000" 
             class="w-full h-full border-none outline-none z-10" 
-            title="Schneider CRM Portal"
+            title="ServiceFlow CRM Portal"
             allow="geolocation; microphone; camera; midi; encrypted-media;"
         ></iframe>
     </div>
@@ -81,7 +81,7 @@
             </div>
 
             <!-- Loading Headers -->
-            <h2 class="text-2xl font-bold tracking-tight text-white mb-2">SCHNEIDER INDUSTRY</h2>
+            <h2 class="text-2xl font-bold tracking-tight text-white mb-2">SERVICEFLOW</h2>
             <p class="text-sm text-cyan-400/80 font-mono tracking-widest uppercase mb-6">Initializing AI CRM & 3D Fleet Hub</p>
             
             <!-- Progress Status -->

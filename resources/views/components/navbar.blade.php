@@ -21,7 +21,7 @@
                     <i data-lucide="zap" class="h-5 w-5 text-white"></i>
                 </div>
                 <span class="text-lg font-bold tracking-tight text-white group-hover:text-emerald-400 transition-colors">
-                    Schneider
+                    ServiceFlow
                 </span>
             </a>
 

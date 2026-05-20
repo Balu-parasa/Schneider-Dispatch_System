@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Customer Dashboard - Schneider')
+@section('title', 'Customer Dashboard - ServiceFlow')
 
 @section('content')
 <div class="min-h-screen pt-24 pb-16" 
@@ -82,7 +82,7 @@
                     <div class="space-y-3 text-xs">
                         <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
                             <span class="text-slate-400">Emergency Hotlines</span>
-                            <span class="text-emerald-400 font-bold">1-800-SCHNEIDER</span>
+                            <span class="text-emerald-400 font-bold">1-800-SERVICEFLOW</span>
                         </div>
                         <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
                             <span class="text-slate-400">Database Status</span>

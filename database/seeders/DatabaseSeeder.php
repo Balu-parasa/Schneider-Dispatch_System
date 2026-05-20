@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
     {
         $admin = User::create([
             'name' => 'System Admin',
-            'email' => 'admin@schneider.com',
+            'email' => 'admin@serviceflow.com',
             'password' => Hash::make('password'),
             'role' => UserRole::Admin,
             'phone' => '+1 555-0100',
@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
 
         $customer = User::create([
             'name' => 'Sarah Johnson',
-            'email' => 'customer@schneider.com',
+            'email' => 'customer@serviceflow.com',
             'password' => Hash::make('password'),
             'role' => UserRole::Customer,
             'phone' => '+1 555-0101',
@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
 
         $jessica = User::create([
             'name' => 'Jessica Martinez',
-            'email' => 'jessica@schneider.com',
+            'email' => 'jessica@serviceflow.com',
             'password' => Hash::make('password'),
             'role' => UserRole::Customer,
             'phone' => '+1 555-0201',
@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
 
         $david = User::create([
             'name' => 'David Chen',
-            'email' => 'david_customer@schneider.com',
+            'email' => 'david_customer@serviceflow.com',
             'password' => Hash::make('password'),
             'role' => UserRole::Customer,
             'phone' => '+1 555-0202',
@@ -51,7 +51,7 @@ class DatabaseSeeder extends Seeder
 
         $thompson = User::create([
             'name' => 'Sarah Thompson',
-            'email' => 'thompson@schneider.com',
+            'email' => 'thompson@serviceflow.com',
             'password' => Hash::make('password'),
             'role' => UserRole::Customer,
             'phone' => '+1 555-0203',
@@ -66,10 +66,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $technicians = [
-            ['name' => 'John Mitchell', 'email' => 'john@schneider.com', 'specialty' => 'HVAC', 'status' => TechnicianStatus::Online],
-            ['name' => 'Maria Garcia', 'email' => 'maria@schneider.com', 'specialty' => 'Plumbing', 'status' => TechnicianStatus::Busy],
-            ['name' => 'David Chen', 'email' => 'david@schneider.com', 'specialty' => 'Electrical', 'status' => TechnicianStatus::Online],
-            ['name' => 'Emily Watson', 'email' => 'emily@schneider.com', 'specialty' => 'Emergency Services', 'status' => TechnicianStatus::Emergency],
+            ['name' => 'John Mitchell', 'email' => 'john@serviceflow.com', 'specialty' => 'HVAC', 'status' => TechnicianStatus::Online],
+            ['name' => 'Maria Garcia', 'email' => 'maria@serviceflow.com', 'specialty' => 'Plumbing', 'status' => TechnicianStatus::Busy],
+            ['name' => 'David Chen', 'email' => 'david@serviceflow.com', 'specialty' => 'Electrical', 'status' => TechnicianStatus::Online],
+            ['name' => 'Emily Watson', 'email' => 'emily@serviceflow.com', 'specialty' => 'Emergency Services', 'status' => TechnicianStatus::Emergency],
         ];
 
         $techUsers = collect();
@@ -268,9 +268,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->command->info('Seeded demo users:');
-        $this->command->info('  Admin: admin@schneider.com / password');
-        $this->command->info('  Customer: customer@schneider.com / password');
+        $this->command->info('  Admin: admin@serviceflow.com / password');
+        $this->command->info('  Customer: customer@serviceflow.com / password');
         $this->command->info('  Balu Parasa: baluparasa3@gmail.com / password');
-        $this->command->info('  Technicians: john@schneider.com, maria@schneider.com, etc. / password');
+        $this->command->info('  Technicians: john@serviceflow.com, maria@serviceflow.com, etc. / password');
     }
 }

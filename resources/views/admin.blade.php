@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Admin Platform Command - Schneider')
+@section('title', 'Admin Platform Command - ServiceFlow')
 
 @section('content')
 <div class="min-h-screen pt-24 pb-16" 

@@ -29,7 +29,7 @@ class AIController extends Controller
                 'contents' => [
                     [
                         'parts' => [
-                            ['text' => "You are an intelligent CRM chat assistant for the Schneider Industry Platform. Reply concisely and professionally to the following customer message: " . $message]
+                            ['text' => "You are an intelligent CRM chat assistant for the ServiceFlow Industry Platform. Reply concisely and professionally to the following customer message: " . $message]
                         ]
                     ]
                 ]
@@ -37,7 +37,7 @@ class AIController extends Controller
 
             if ($response->successful()) {
                 $data = $response->json();
-                $reply = $data['candidates'][0]['content']['parts'][0]['text'] ?? "I am here to assist you with your Schneider service needs.";
+                $reply = $data['candidates'][0]['content']['parts'][0]['text'] ?? "I am here to assist you with your ServiceFlow service needs.";
                 return response()->json([
                     'status' => 'success',
                     'reply' => trim($reply),
@@ -49,7 +49,7 @@ class AIController extends Controller
             // Fallback response for offline or unconfigured API keys
             return response()->json([
                 'status' => 'success',
-                'reply' => "Thank you for contacting Schneider support. How can I help you manage your bookings, properties, or technical requests today?",
+                'reply' => "Thank you for contacting ServiceFlow support. How can I help you manage your bookings, properties, or technical requests today?",
             ]);
 
         } catch (\Exception $e) {
