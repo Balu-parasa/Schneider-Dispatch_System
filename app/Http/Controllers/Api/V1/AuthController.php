@@ -96,6 +96,37 @@ class AuthController extends Controller
             ]
         );
 
+        try {
+            \Illuminate\Support\Facades\Mail::html("
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; color: #1a202c;'>
+                    <div style='text-align: center; margin-bottom: 24px;'>
+                        <h2 style='color: #2563eb; margin: 0; font-size: 28px; font-weight: bold; letter-spacing: -0.5px;'>ServiceFlow</h2>
+                        <p style='color: #718096; margin-top: 4px; font-size: 14px;'>Real-Time Dispatch & Service Management Platform</p>
+                    </div>
+                    <div style='padding: 24px; background-color: #f7fafc; border-radius: 8px;'>
+                        <h3 style='color: #2d3748; margin-top: 0; font-size: 20px; font-weight: 600;'>Reset Your Password</h3>
+                        <p style='color: #4a5568; font-size: 16px; line-height: 1.6;'>You requested a password reset for your ServiceFlow account. Use the following 6-digit verification code (OTP) to reset your password. This code will expire in 60 minutes.</p>
+                        <div style='text-align: center; margin: 32px 0;'>
+                            <span style='display: inline-block; font-family: monospace; font-size: 36px; font-weight: bold; letter-spacing: 6px; color: #2563eb; background-color: #ebf8ff; padding: 12px 32px; border: 1px dashed #bee3f8; border-radius: 8px;'>{$otp}</span>
+                        </div>
+                        <p style='color: #e53e3e; font-size: 14px; font-weight: 500;'>If you did not request a password reset, please ignore this email or secure your account.</p>
+                    </div>
+                    <div style='text-align: center; margin-top: 24px; color: #a0aec0; font-size: 12px;'>
+                        &copy; " . date('Y') . " ServiceFlow. All rights reserved.
+                    </div>
+                </div>
+            ", function ($message) use ($request) {
+                $message->to($request->email)
+                        ->subject('ServiceFlow Password Reset Verification Code (OTP)');
+            });
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('SMTP Mail send failed: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to send OTP via email. Please check your SMTP configuration in your .env file. Error: ' . $e->getMessage(),
+                'otp' => $otp,
+            ], 500);
+        }
+
         return response()->json([
             'message' => 'Verification code sent to your email address.',
             'otp' => $otp, // Expose for easy testing and copy-pasting locally
