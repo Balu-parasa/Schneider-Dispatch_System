@@ -1,0 +1,9 @@
+/ServiceFlow-backend/vendor/
+/ServiceFlow-backend/vendor_trash_*/
+/ServiceFlow-backend/node_modules/
+/ServiceFlow-frontend/vendor/
+/ServiceFlow-frontend/node_modules/
+/ServiceFlow-frontend/.next/
+*.log
+.env
+.vscode/
