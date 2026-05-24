@@ -383,6 +383,15 @@ function HeroSection({ stats }: HeroSectionProps) {
 
 // Services Section
 function ServicesSection() {
+  const handleServiceClick = () => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+    if (token) {
+      window.location.href = "/booking"
+    } else {
+      window.location.href = "/login?redirect=/booking&message=first%20u%20have%20to%20login"
+    }
+  }
+
   const services = [
     {
       icon: Thermometer,
@@ -462,6 +471,7 @@ function ServicesSection() {
           {services.map((service, i) => (
             <motion.div
               key={i}
+              onClick={handleServiceClick}
               variants={fadeInUp}
               whileHover={{ y: -5, scale: 1.02 }}
               className="group glass-card cursor-pointer rounded-xl p-6 transition-all hover:border-primary/30"
