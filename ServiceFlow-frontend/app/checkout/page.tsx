@@ -64,7 +64,7 @@ function CheckoutContent() {
         } else {
           router.push("/?subscription=success")
         }
-      }, 1500)
+      }, 3500)
     }, 800)
   }
 
