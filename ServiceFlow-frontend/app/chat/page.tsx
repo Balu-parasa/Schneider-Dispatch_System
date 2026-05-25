@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect, useRef, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
@@ -10,7 +10,7 @@ import {
   ChevronLeft,
   MessageSquare,
   Calendar,
-  DollarSign,
+  IndianRupee,
   MapPin,
   User,
   Clock,
@@ -387,9 +387,9 @@ function ChatContent() {
                 </div>
 
                 <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
-                  <DollarSign className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <IndianRupee className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-foreground font-semibold block">${booking?.estimated_cost}</span>
+                    <span className="text-foreground font-semibold block">₹{booking?.estimated_cost}</span>
                     <span>Estimated Contract Price</span>
                   </div>
                 </div>

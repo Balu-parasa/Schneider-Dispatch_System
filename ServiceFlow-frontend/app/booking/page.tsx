@@ -37,10 +37,14 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
+import { cn, formatCurrency } from "@/lib/utils"
 import { ThemeToggleCompact } from "@/components/theme-toggle"
 import api from "@/lib/api"
+import { useRouter } from "next/navigation"
 import echoInstance from "@/lib/echo"
+import dynamic from "next/dynamic"
+
+const LocationMap = dynamic(() => import("@/components/LocationMap"), { ssr: false })
 
 const steps = [
   { id: 1, title: "Service", icon: Wrench },
@@ -175,6 +179,7 @@ interface BookingData {
 
 export default function BookingPage() {
   const [currentStep, setCurrentStep] = useState(1)
+  const router = useRouter()
   const [isAuthLoading, setIsAuthLoading] = useState(true)
   const [dbServices, setDbServices] = useState<any[]>([])
   const [dbTechnicians, setDbTechnicians] = useState<any[]>([])
@@ -335,7 +340,7 @@ export default function BookingPage() {
 
   const handleBack = () => {
     if (currentStep === 1) {
-      window.location.href = "/customer"
+      router.push("/customer")
     } else {
       prevStep()
     }
@@ -371,13 +376,13 @@ export default function BookingPage() {
 
       const response = await api.post("/bookings", payload)
       if (response.data?.data?.id) {
-        window.location.href = `/checkout?plan=Service+Booking&price=$${estimatedTotal}&booking_id=${response.data.data.id}`
+        router.push(`/checkout?plan=Service+Booking&price=${encodeURIComponent(formatCurrency(estimatedTotal))}&booking_id=${response.data.data.id}`)
       } else {
-        window.location.href = `/checkout?plan=Service+Booking&price=$${estimatedTotal}`
+        router.push(`/checkout?plan=Service+Booking&price=${encodeURIComponent(formatCurrency(estimatedTotal))}`)
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Booking submission failed, falling back to checkout:", err)
-      window.location.href = `/checkout?plan=Service+Booking&price=$${estimatedTotal}`
+      router.push(`/checkout?plan=Service+Booking&price=${encodeURIComponent(formatCurrency(estimatedTotal))}`)
     } finally {
       setIsSubmitting(false)
     }
@@ -444,12 +449,10 @@ export default function BookingPage() {
               </div>
             )}
             <ThemeToggleCompact />
-            <Link href="/customer">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back
-              </Button>
-            </Link>
+            <Button variant="ghost" size="sm" onClick={handleBack}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
           </div>
         </div>
       </header>
@@ -664,60 +667,18 @@ export default function BookingPage() {
                   </div>
                 </div>
 
-                {/* Address Form */}
+                {/* Address Form & Map */}
                 <div className="glass-card rounded-xl p-6">
-                  <div className="grid gap-4">
-                    <div>
-                      <Label htmlFor="address">Street Address</Label>
-                      <Input
-                        id="address"
-                        placeholder="123 Main Street"
-                        value={bookingData.address}
-                        onChange={(e) =>
-                          updateBookingData("address", e.target.value)
-                        }
-                        className="mt-2 bg-secondary/50"
-                      />
-                    </div>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div>
-                        <Label htmlFor="city">City</Label>
-                        <Input
-                          id="city"
-                          placeholder="San Francisco"
-                          value={bookingData.city}
-                          onChange={(e) =>
-                            updateBookingData("city", e.target.value)
-                          }
-                          className="mt-2 bg-secondary/50"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="zipCode">ZIP Code</Label>
-                        <Input
-                          id="zipCode"
-                          placeholder="94102"
-                          value={bookingData.zipCode}
-                          onChange={(e) =>
-                            updateBookingData("zipCode", e.target.value)
-                          }
-                          className="mt-2 bg-secondary/50"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Map Placeholder */}
-                <div className="mt-6 overflow-hidden rounded-xl">
-                  <div className="glass-card flex h-48 items-center justify-center">
-                    <div className="text-center">
-                      <MapPin className="mx-auto h-8 w-8 text-primary" />
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        Live map preview
-                      </p>
-                    </div>
-                  </div>
+                  <LocationMap 
+                    initialAddress={bookingData.address}
+                    onLocationSelect={(loc) => {
+                      updateBookingData("address", loc.address)
+                      updateBookingData("city", loc.city)
+                      updateBookingData("zipCode", loc.zipCode)
+                      updateBookingData("latitude", loc.latitude)
+                      updateBookingData("longitude", loc.longitude)
+                    }}
+                  />
                 </div>
               </div>
             )}
@@ -1058,7 +1019,7 @@ export default function BookingPage() {
                             </div>
                             <div className="mt-4 flex items-center justify-between border-t border-border/50 pt-3">
                               <span className="text-xs font-semibold text-primary">
-                                ${tech.technician_profile?.hourly_rate || "75"}/hr
+                                {formatCurrency(tech.technician_profile?.hourly_rate || 75)}/hr
                               </span>
                               <div className="flex items-center gap-2">
                                 <span className={cn(

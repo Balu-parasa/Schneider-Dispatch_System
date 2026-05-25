@@ -17,9 +17,17 @@
         scheduledDate: '',
         timeSlot: 'morning',
         specificTime: '',
-        services: [],
         technicians: [],
         isSubmitting: false,
+
+        latitude: '',
+        longitude: '',
+        map: null,
+        marker: null,
+        isGeocoding: false,
+        searchResults: [],
+        showResults: false,
+        addressSearchQuery: '',
 
         init() {
             // Load live services and techs from endpoints
@@ -52,6 +60,8 @@
                 address: this.address,
                 city: this.city,
                 zip_code: this.zipCode,
+                latitude: this.latitude || null,
+                longitude: this.longitude || null,
                 scheduled_date: this.scheduledDate || null,
                 time_slot: this.timeSlot,
                 specific_time: this.specificTime,
@@ -65,6 +75,96 @@
                 this.isSubmitting = false;
                 alert(err.response?.data?.message || 'Failed to submit booking. Check all fields.');
             });
+        },
+
+        initMap() {
+            if (this.map) return;
+            
+            // Default to India
+            let defaultLat = 20.5937;
+            let defaultLng = 78.9629;
+            
+            this.map = L.map('location-map').setView([defaultLat, defaultLng], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(this.map);
+            
+            this.marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(this.map);
+            
+            this.marker.on('dragend', (e) => {
+                const pos = e.target.getLatLng();
+                this.latitude = pos.lat.toFixed(6);
+                this.longitude = pos.lng.toFixed(6);
+                this.reverseGeocode(pos.lat, pos.lng);
+            });
+            
+            // Try to get user location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    this.map.setView([lat, lng], 13);
+                    this.marker.setLatLng([lat, lng]);
+                    this.latitude = lat.toFixed(6);
+                    this.longitude = lng.toFixed(6);
+                    this.reverseGeocode(lat, lng);
+                });
+            }
+        },
+
+        searchAddress() {
+            if (!this.addressSearchQuery || this.addressSearchQuery.length < 3) {
+                this.searchResults = [];
+                this.showResults = false;
+                return;
+            }
+            this.isGeocoding = true;
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(this.addressSearchQuery)}&limit=5`)
+                .then(res => res.json())
+                .then(data => {
+                    this.searchResults = data;
+                    this.showResults = true;
+                    this.isGeocoding = false;
+                })
+                .catch(() => {
+                    this.isGeocoding = false;
+                });
+        },
+
+        selectLocation(result) {
+            const lat = parseFloat(result.lat);
+            const lng = parseFloat(result.lon);
+            
+            this.address = result.display_name;
+            this.addressSearchQuery = result.display_name;
+            
+            let parts = result.display_name.split(',');
+            if(parts.length > 2) {
+                this.city = parts[parts.length - 3]?.trim() || '';
+                this.zipCode = parts[parts.length - 2]?.trim() || '';
+            }
+            
+            this.latitude = lat.toFixed(6);
+            this.longitude = lng.toFixed(6);
+            
+            this.map.setView([lat, lng], 16);
+            this.marker.setLatLng([lat, lng]);
+            
+            this.showResults = false;
+            this.searchResults = [];
+        },
+
+        reverseGeocode(lat, lng) {
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.display_name) {
+                        this.address = data.display_name;
+                        this.addressSearchQuery = data.display_name;
+                        this.city = data.address?.city || data.address?.town || data.address?.village || data.address?.county || '';
+                        this.zipCode = data.address?.postcode || '';
+                    }
+                });
         }
      }">
 
@@ -153,22 +253,69 @@
                     </button>
                 </div>
 
-                <!-- Address Inputs -->
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Street Address</label>
-                        <input type="text" x-model="address" placeholder="123 Main Street" class="block w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white mt-2 focus:outline-none focus:border-emerald-500 transition-all" />
-                    </div>
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <div>
-                            <label class="text-xs font-bold uppercase tracking-wider text-slate-400">City</label>
-                            <input type="text" x-model="city" placeholder="San Francisco" class="block w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white mt-2 focus:outline-none focus:border-emerald-500 transition-all" />
+                <!-- Address Search Input & Map -->
+                <div class="space-y-4" x-init="$watch('step', value => { if (value === 2) { setTimeout(() => { initMap(); if(window.lucide) lucide.createIcons(); }, 300); } })">
+                    <div class="relative">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Search Service Address</label>
+                        <div class="relative mt-2">
+                            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400"></i>
+                            <input type="text" 
+                                   x-model.debounce.500ms="addressSearchQuery" 
+                                   @input="searchAddress()"
+                                   @focus="if(searchResults.length > 0) showResults = true"
+                                   @click.away="showResults = false"
+                                   placeholder="Search for an address or area..." 
+                                   class="block w-full rounded-xl bg-white/5 border border-white/10 pl-11 pr-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 transition-all" />
+                            <div x-show="isGeocoding" class="absolute right-4 top-1/2 -translate-y-1/2">
+                                <div class="h-4 w-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                            </div>
                         </div>
-                        <div>
-                            <label class="text-xs font-bold uppercase tracking-wider text-slate-400">ZIP Code</label>
-                            <input type="text" x-model="zipCode" placeholder="94102" class="block w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-sm text-white mt-2 focus:outline-none focus:border-emerald-500 transition-all" />
+
+                        <!-- Autocomplete Dropdown -->
+                        <div x-show="showResults && searchResults.length > 0" 
+                             x-transition
+                             class="absolute z-50 w-full mt-2 bg-[#151c2c] border border-white/10 rounded-xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto">
+                            <template x-for="result in searchResults" :key="result.place_id">
+                                <button type="button" 
+                                        @click="selectLocation(result)"
+                                        class="w-full text-left px-4 py-3 hover:bg-white/5 border-b border-white/5 last:border-0 cursor-pointer flex items-start gap-3">
+                                    <i data-lucide="map-pin" class="h-4 w-4 text-emerald-400 mt-0.5 shrink-0"></i>
+                                    <span x-text="result.display_name" class="text-sm text-slate-300"></span>
+                                </button>
+                            </template>
                         </div>
                     </div>
+
+                    <!-- Map Container -->
+                    <div class="relative w-full h-[300px] sm:h-[400px] rounded-2xl overflow-hidden border border-white/10 shadow-lg shadow-black/40 mt-6" style="z-index: 10;">
+                        <div id="location-map" class="w-full h-full z-10" style="position: absolute; top:0; left:0;"></div>
+                        
+                        <!-- Map Overlay Controls -->
+                        <div class="absolute bottom-4 right-4 z-20">
+                            <button type="button" title="Center to my location" @click="navigator.geolocation.getCurrentPosition(pos => { const {latitude: lat, longitude: lng} = pos.coords; map.setView([lat, lng], 16); marker.setLatLng([lat, lng]); reverseGeocode(lat, lng); latitude=lat.toFixed(6); longitude=lng.toFixed(6); })" class="bg-[#151c2c]/90 backdrop-blur-md p-3 rounded-xl border border-white/10 text-emerald-400 shadow-lg hover:bg-[#151c2c] transition-colors cursor-pointer group">
+                                <i data-lucide="crosshair" class="h-5 w-5 group-hover:scale-110 transition-transform"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Coordinates Display -->
+                    <div class="flex items-center justify-between bg-emerald-600/10 border border-emerald-500/20 rounded-xl p-4 mt-4">
+                        <div class="flex items-center gap-3">
+                            <div class="h-2 w-2 rounded-full animate-pulse" :class="latitude ? 'bg-emerald-500' : 'bg-slate-500'"></div>
+                            <span class="text-xs font-semibold" :class="latitude ? 'text-emerald-400' : 'text-slate-400'" x-text="latitude ? 'Location Locked' : 'Searching Location...'"></span>
+                        </div>
+                        <div class="text-xs font-mono text-slate-400">
+                            <span x-text="latitude ? latitude : '0.000000'"></span>, 
+                            <span x-text="longitude ? longitude : '0.000000'"></span>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Inputs for form fallback if needed -->
+                    <input type="hidden" x-model="address">
+                    <input type="hidden" x-model="city">
+                    <input type="hidden" x-model="zipCode">
+                    <input type="hidden" x-model="latitude">
+                    <input type="hidden" x-model="longitude">
                 </div>
             </div>
 

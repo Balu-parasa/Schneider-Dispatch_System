@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, CreditCard, ShieldCheck, Lock, Zap, CheckCircle2, ChevronRight, Fingerprint } from "lucide-react"
@@ -10,12 +10,12 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { DotLottieReact } from '@lottiefiles/dotlottie-react'
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   
   const plan = searchParams.get("plan") || "Pro Plan"
-  const price = searchParams.get("price") || "$9.99"
+  const price = searchParams.get("price") || "₹299"
   const bookingId = searchParams.get("booking_id")
 
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success'>('idle')
@@ -64,8 +64,8 @@ export default function CheckoutPage() {
         } else {
           router.push("/?subscription=success")
         }
-      }, 5000)
-    }, 2500)
+      }, 1500)
+    }, 800)
   }
 
   return (
@@ -387,5 +387,13 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center bg-background"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>}>
+      <CheckoutContent />
+    </Suspense>
   )
 }

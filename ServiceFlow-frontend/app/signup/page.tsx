@@ -106,7 +106,7 @@ export default function SignupPage() {
       document.cookie = `token=${token}; path=/; max-age=31536000; SameSite=Lax`
 
       // Redirect
-      window.location.href = redirectPath || redirect || "/customer"
+      router.push(redirectPath || redirect || "/customer")
     } catch (err: any) {
       console.error(err)
       let message = "Registration failed. Please check details."

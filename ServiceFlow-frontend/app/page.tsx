@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import {
@@ -52,6 +53,7 @@ const staggerContainer = {
 
 // Navbar Component
 function Navbar() {
+  const router = useRouter()
   return (
     <motion.nav
       initial={{ opacity: 0, y: -20 }}
@@ -108,9 +110,9 @@ function Navbar() {
               onClick={() => {
                 const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
                 if (token) {
-                  window.location.href = '/booking';
+                  router.push('/booking');
                 } else {
-                  window.location.href = `/login?redirect=/booking&message=first%20u%20have%20to%20login`;
+                  router.push(`/login?redirect=/booking&message=first%20u%20have%20to%20login`);
                 }
               }}
             >
@@ -347,7 +349,7 @@ function HeroSection({ stats }: HeroSectionProps) {
                     Job Completed
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    AC Repair - $285
+                    AC Repair - ₹2850
                   </div>
                 </div>
               </div>
@@ -383,12 +385,13 @@ function HeroSection({ stats }: HeroSectionProps) {
 
 // Services Section
 function ServicesSection() {
+  const router = useRouter()
   const handleServiceClick = () => {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
     if (token) {
-      window.location.href = "/booking"
+      router.push("/booking")
     } else {
-      window.location.href = "/login?redirect=/booking&message=first%20u%20have%20to%20login"
+      router.push("/login?redirect=/booking&message=first%20u%20have%20to%20login")
     }
   }
 
@@ -736,13 +739,14 @@ function TestimonialsSection() {
 
 // CTA Section
 function CTASection() {
+  const router = useRouter()
   const handleNavigate = (target: string) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (token) {
-      window.location.href = target;
+      router.push(target);
     } else {
       const redirectPath = target;
-      window.location.href = `/login?redirect=${redirectPath}&message=first%20u%20have%20to%20login`;
+      router.push(`/login?redirect=${redirectPath}&message=first%20u%20have%20to%20login`);
     }
   };
 

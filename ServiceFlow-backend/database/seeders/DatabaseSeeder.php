@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
     {
         $admin = User::create([
             'name' => 'System Admin',
-            'email' => 'admin@schneider.com',
+            'email' => 'admin@serviceflow.com',
             'password' => Hash::make('password'),
             'role' => UserRole::Admin,
             'phone' => '+1 555-0100',
@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
 
         $customer = User::create([
             'name' => 'Sarah Johnson',
-            'email' => 'customer@schneider.com',
+            'email' => 'customer@serviceflow.com',
             'password' => Hash::make('password'),
             'role' => UserRole::Customer,
             'phone' => '+1 555-0101',
@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
 
         $jessica = User::create([
             'name' => 'Jessica Martinez',
-            'email' => 'jessica@schneider.com',
+            'email' => 'jessica@serviceflow.com',
             'password' => Hash::make('password'),
             'role' => UserRole::Customer,
             'phone' => '+1 555-0201',
@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
 
         $david = User::create([
             'name' => 'David Chen',
-            'email' => 'david_customer@schneider.com',
+            'email' => 'david_customer@serviceflow.com',
             'password' => Hash::make('password'),
             'role' => UserRole::Customer,
             'phone' => '+1 555-0202',
@@ -51,7 +51,7 @@ class DatabaseSeeder extends Seeder
 
         $thompson = User::create([
             'name' => 'Sarah Thompson',
-            'email' => 'thompson@schneider.com',
+            'email' => 'thompson@serviceflow.com',
             'password' => Hash::make('password'),
             'role' => UserRole::Customer,
             'phone' => '+1 555-0203',
@@ -66,10 +66,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $technicians = [
-            ['name' => 'John Mitchell', 'email' => 'john@schneider.com', 'specialty' => 'HVAC', 'status' => TechnicianStatus::Online],
-            ['name' => 'Maria Garcia', 'email' => 'maria@schneider.com', 'specialty' => 'Plumbing', 'status' => TechnicianStatus::Busy],
-            ['name' => 'David Chen', 'email' => 'david@schneider.com', 'specialty' => 'Electrical', 'status' => TechnicianStatus::Online],
-            ['name' => 'Emily Watson', 'email' => 'emily@schneider.com', 'specialty' => 'Emergency Services', 'status' => TechnicianStatus::Emergency],
+            ['name' => 'John Mitchell', 'email' => 'john@serviceflow.com', 'specialty' => 'HVAC', 'status' => TechnicianStatus::Online],
+            ['name' => 'Maria Garcia', 'email' => 'maria@serviceflow.com', 'specialty' => 'Plumbing', 'status' => TechnicianStatus::Busy],
+            ['name' => 'David Chen', 'email' => 'david@serviceflow.com', 'specialty' => 'Electrical', 'status' => TechnicianStatus::Online],
+            ['name' => 'Emily Watson', 'email' => 'emily@serviceflow.com', 'specialty' => 'Emergency Services', 'status' => TechnicianStatus::Emergency],
         ];
 
         $techUsers = collect();
@@ -105,12 +105,12 @@ class DatabaseSeeder extends Seeder
         }
 
         $services = [
-            ['slug' => 'hvac', 'name' => 'HVAC', 'category' => 'HVAC', 'icon' => 'wind', 'base_price' => 89],
-            ['slug' => 'plumbing', 'name' => 'Plumbing', 'category' => 'Plumbing', 'icon' => 'droplets', 'base_price' => 75],
-            ['slug' => 'electrical', 'name' => 'Electrical', 'category' => 'Electrical', 'icon' => 'zap', 'base_price' => 85],
-            ['slug' => 'appliance', 'name' => 'Appliance Repair', 'category' => 'Appliance', 'icon' => 'refrigerator', 'base_price' => 69],
-            ['slug' => 'industrial', 'name' => 'Industrial Maintenance', 'category' => 'Industrial', 'icon' => 'factory', 'base_price' => 150],
-            ['slug' => 'emergency', 'name' => 'Emergency Services', 'category' => 'Emergency', 'icon' => 'alert-triangle', 'base_price' => 120, 'is_emergency' => true],
+            ['slug' => 'hvac', 'name' => 'HVAC', 'category' => 'HVAC', 'icon' => 'wind', 'base_price' => 899],
+            ['slug' => 'plumbing', 'name' => 'Plumbing', 'category' => 'Plumbing', 'icon' => 'droplets', 'base_price' => 799],
+            ['slug' => 'electrical', 'name' => 'Electrical', 'category' => 'Electrical', 'icon' => 'zap', 'base_price' => 849],
+            ['slug' => 'appliance', 'name' => 'Appliance Repair', 'category' => 'Appliance', 'icon' => 'refrigerator', 'base_price' => 699],
+            ['slug' => 'industrial', 'name' => 'Industrial Maintenance', 'category' => 'Industrial', 'icon' => 'factory', 'base_price' => 1499],
+            ['slug' => 'emergency', 'name' => 'Emergency Services', 'category' => 'Emergency', 'icon' => 'alert-triangle', 'base_price' => 1199, 'is_emergency' => true],
         ];
 
         foreach ($services as $i => $service) {
@@ -139,7 +139,7 @@ class DatabaseSeeder extends Seeder
             'scheduled_date' => now()->toDateString(),
             'time_slot' => 'afternoon',
             'specific_time' => '2:00 PM',
-            'estimated_cost' => 89,
+            'estimated_cost' => 899,
             'eta_minutes' => 12,
             'priority' => 'normal',
             'assigned_at' => now()->subHour(),
@@ -158,7 +158,7 @@ class DatabaseSeeder extends Seeder
             'address' => '100 Market Street',
             'city' => 'San Francisco',
             'zip_code' => '94105',
-            'estimated_cost' => 180,
+            'estimated_cost' => 1800,
             'priority' => 'emergency',
         ]);
 
@@ -178,8 +178,8 @@ class DatabaseSeeder extends Seeder
             'scheduled_date' => now()->subDays(2)->toDateString(),
             'time_slot' => 'morning',
             'specific_time' => '10:00 AM',
-            'estimated_cost' => 120,
-            'final_cost' => 120,
+            'estimated_cost' => 1200,
+            'final_cost' => 1200,
             'eta_minutes' => 8,
             'priority' => 'normal',
             'assigned_at' => now()->subDays(2)->subHours(2),
@@ -212,8 +212,8 @@ class DatabaseSeeder extends Seeder
             'scheduled_date' => now()->subDays(5)->toDateString(),
             'time_slot' => 'afternoon',
             'specific_time' => '3:30 PM',
-            'estimated_cost' => 150,
-            'final_cost' => 150,
+            'estimated_cost' => 1500,
+            'final_cost' => 1500,
             'eta_minutes' => 15,
             'priority' => 'normal',
             'assigned_at' => now()->subDays(5)->subHours(3),
@@ -248,8 +248,8 @@ class DatabaseSeeder extends Seeder
             'scheduled_date' => now()->subDays(1)->toDateString(),
             'time_slot' => 'morning',
             'specific_time' => '8:15 AM',
-            'estimated_cost' => 180,
-            'final_cost' => 240,
+            'estimated_cost' => 1800,
+            'final_cost' => 2400,
             'eta_minutes' => 20,
             'priority' => 'emergency',
             'assigned_at' => now()->subDays(1)->subHour(),
@@ -267,10 +267,11 @@ class DatabaseSeeder extends Seeder
             'comment' => 'The emergency response time is unmatched. When our HVAC system failed during a heatwave, they had a technician on-site within 20 minutes.',
         ]);
 
-        $this->command->info('Seeded demo users:');
-        $this->command->info('  Admin: admin@schneider.com / password');
-        $this->command->info('  Customer: customer@schneider.com / password');
-        $this->command->info('  Balu Parasa: baluparasa3@gmail.com / password');
-        $this->command->info('  Technicians: john@schneider.com, maria@schneider.com, etc. / password');
+        $this->command->info('Database seeded with demo ServiceFlow data!');
+        $this->command->info('Test Accounts:');
+        $this->command->info('  Admin: admin@serviceflow.com / password');
+        $this->command->info('  Customer: customer@serviceflow.com / password');
+        $this->command->info('  Balu (Customer): baluparasa3@gmail.com / password');
+        $this->command->info('  Technicians: john@serviceflow.com, maria@serviceflow.com, etc. / password');
     }
 }

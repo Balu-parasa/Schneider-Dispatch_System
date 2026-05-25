@@ -24,6 +24,10 @@ import { cn } from "@/lib/utils"
 import api from "@/lib/api"
 import echoInstance from "@/lib/echo"
 import { toast, Toaster } from "sonner"
+import dynamic from "next/dynamic"
+import { formatCurrency } from "@/lib/utils"
+
+const TrackingMap = dynamic(() => import("@/components/TrackingMap"), { ssr: false })
 
 const technicianData = {
   name: "John Mitchell",
@@ -41,7 +45,7 @@ const jobDetails = {
   service: "HVAC Repair",
   address: "123 Main Street, San Francisco, CA 94102",
   scheduledTime: "Today, 10:00 AM - 12:00 PM",
-  estimatedCost: "$89 - $150",
+  estimatedCost: "₹899 - ₹1499",
 }
 
 const trackingSteps = [
@@ -177,7 +181,7 @@ export default function TrackingPage() {
         scheduledTime: booking.is_emergency
           ? "Immediate Dispatch"
           : `${booking.scheduled_date || "Today"}, ${booking.specific_time || "9:00 AM"}`,
-        estimatedCost: booking.estimated_cost ? `$${booking.estimated_cost}` : "$89 - $150",
+        estimatedCost: booking.estimated_cost ? formatCurrency(booking.estimated_cost) : formatCurrency(899),
       }
     }
     return jobDetails
@@ -258,19 +262,36 @@ export default function TrackingPage() {
     return () => clearInterval(interval)
   }, [])
 
-  if (isAuthLoading) {
+  if (isAuthLoading || loadingBooking) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-background text-foreground">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="mt-4 text-sm text-muted-foreground">Verifying tracking authorization...</p>
+          <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
+          <p className="text-muted-foreground">
+            {isAuthLoading ? "Authenticating..." : "Loading tracking data..."}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!booking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-center">
+          <AlertTriangle className="mx-auto h-12 w-12 text-destructive mb-4" />
+          <h2 className="text-2xl font-bold text-foreground">Booking Not Found</h2>
+          <p className="text-muted-foreground mt-2 mb-6">We couldn't find the tracking details for this booking.</p>
+          <Link href="/customer">
+            <Button variant="default">Return to Dashboard</Button>
+          </Link>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative selection:bg-primary/30">
       <Toaster richColors position="top-right" />
       {/* Header */}
       <header className="glass fixed left-0 right-0 top-0 z-50">
@@ -339,52 +360,12 @@ export default function TrackingPage() {
               transition={{ delay: 0.1 }}
               className="glass-card overflow-hidden rounded-xl"
             >
-              <div className="relative h-64 bg-secondary/30">
-                <div className="absolute inset-0 grid-pattern opacity-50" />
-
-                {/* Simulated Route */}
-                <svg className="absolute inset-0 h-full w-full">
-                  <motion.path
-                    d="M 50 180 Q 120 120 180 100 Q 240 80 280 120"
-                    fill="none"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth="3"
-                    strokeDasharray="8 4"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 2, ease: "easeInOut" }}
-                  />
-                </svg>
-
-                {/* Technician Marker */}
-                <motion.div
-                  className="absolute"
-                  initial={{ left: "15%", top: "70%" }}
-                  animate={{ left: "45%", top: "40%" }}
-                  transition={{
-                    duration: 20,
-                    ease: "linear",
-                  }}
-                >
-                  <div className="relative">
-                    <div className="h-6 w-6 rounded-full bg-primary glow-blue">
-                      <span className="absolute inset-0 animate-ping rounded-full bg-primary opacity-75" />
-                    </div>
-                    <div className="absolute left-8 top-0 whitespace-nowrap rounded bg-card px-2 py-1 text-xs font-medium text-foreground shadow-lg">
-                      {resolvedTech.name}
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Destination Marker */}
-                <div className="absolute right-[25%] top-[45%]">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-success">
-                    <MapPin className="h-4 w-4 text-success-foreground" />
-                  </div>
-                  <div className="absolute left-10 top-0 whitespace-nowrap rounded bg-card px-2 py-1 text-xs text-foreground shadow-lg">
-                    Your Location
-                  </div>
-                </div>
+              <div className="relative h-64 sm:h-80 bg-secondary/30">
+                <TrackingMap 
+                  techLocation={techLocation} 
+                  destination={destination} 
+                  techName={resolvedTech.name} 
+                />
               </div>
 
               <div className="border-t border-border p-4">
@@ -532,14 +513,26 @@ export default function TrackingPage() {
                 </div>
               </div>
 
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                <Button className="gap-2 glow-blue">
-                  <Phone className="h-4 w-4" />
-                  Call
+              <div className="flex gap-3 mt-6">
+                <Button 
+                  className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                  onClick={() => {
+                    window.location.href = `tel:${resolvedTech.phone || '+15550100'}`;
+                  }}
+                >
+                  <Phone className="mr-2 h-4 w-4" /> Call
                 </Button>
-                <Button variant="outline" className="gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  Message
+                <Button 
+                  className="flex-1"
+                  onClick={() => {
+                    if (booking?.id) {
+                      window.location.href = `/chat?bookingId=${booking.id}`;
+                    } else {
+                      toast.error("Cannot message without an active booking ID");
+                    }
+                  }}
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" /> Message
                 </Button>
               </div>
             </motion.div>
@@ -595,9 +588,7 @@ export default function TrackingPage() {
                     <span className="text-muted-foreground">
                       Estimated Cost
                     </span>
-                    <span className="text-lg font-semibold text-foreground">
-                      {resolvedJob.estimatedCost}
-                    </span>
+                    <span className="font-semibold">{booking?.final_cost ? formatCurrency(booking.final_cost) : resolvedJob.estimatedCost}</span>
                   </div>
                   <p className="mt-2 text-xs text-muted-foreground">
                     Final price determined after on-site assessment

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import {
@@ -8,6 +9,7 @@ import {
   MapPin,
   Clock,
   DollarSign,
+  IndianRupee,
   Navigation,
   Phone,
   MessageSquare,
@@ -50,6 +52,8 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { ThemeToggleCompact } from "@/components/theme-toggle"
+import { formatCurrency } from "@/lib/utils"
 import api from "@/lib/api"
 import dynamic from "next/dynamic"
 import echo from "@/lib/echo"
@@ -174,6 +178,8 @@ const inventoryItems = [
 ]
 
 export default function TechnicianDashboard() {
+  const router = useRouter()
+  const [activeTab, setActiveTab] = useState("mission")
   const [isOnline, setIsOnline] = useState(true)
   const [missionStatus, setMissionStatus] = useState<string>("in_progress")
   const [showAlerts, setShowAlerts] = useState(false)
@@ -223,7 +229,6 @@ export default function TechnicianDashboard() {
     try {
       await api.patch(`/notifications/${notifId}/read`)
       setAlerts(prev => prev.map(a => a.id === notifId ? { ...a, is_read: true } : a))
-      setTimeout(fetchNotifications, 300)
     } catch (err) {
       console.error("Failed to mark alert as read:", err)
     }
@@ -233,7 +238,6 @@ export default function TechnicianDashboard() {
     try {
       await api.post('/notifications/read-all')
       setAlerts(prev => prev.map(a => ({ ...a, is_read: true })))
-      setTimeout(fetchNotifications, 300)
       toast.success("All alerts marked as read")
     } catch (err) {
       console.error("Failed to mark all alerts as read:", err)
@@ -250,9 +254,9 @@ export default function TechnicianDashboard() {
         if (currentUser.role !== 'technician') {
           // Role mismatch - redirect to correct dashboard
           if (currentUser.role === 'admin') {
-            window.location.href = '/admin'
+            router.push('/admin')
           } else {
-            window.location.href = '/customer'
+            router.push('/customer')
           }
           return
         }
@@ -262,11 +266,16 @@ export default function TechnicianDashboard() {
         // Not authenticated
         localStorage.removeItem('token')
         document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;"
-        window.location.href = '/login?redirect=/technician&message=first%20u%20have%20to%20login'
+        router.push('/login?redirect=/technician&message=first%20u%20have%20to%20login')
         return
       }
 
-      const assignmentsRes = await api.get('/technician/assignments')
+      // Fetch remaining data concurrently
+      const [assignmentsRes, earningsRes] = await Promise.all([
+        api.get('/technician/assignments'),
+        api.get('/technician/earnings')
+      ]);
+
       const bookings = assignmentsRes.data.assignments || []
       
       const active = bookings.find((b: any) => 
@@ -285,7 +294,6 @@ export default function TechnicianDashboard() {
 
       fetchNotifications()
 
-      const earningsRes = await api.get('/technician/earnings')
       if (earningsRes.data?.today) {
         setTodayStats({
           completedJobs: earningsRes.data.today.jobs,
@@ -344,9 +352,9 @@ export default function TechnicianDashboard() {
           toast.info(n.title || "New Message", {
             description: n.message,
             action: {
-              label: "View",
+              label: "Chat",
               onClick: () => {
-                window.location.href = `/chat?bookingId=${n.data?.booking_id}`
+                router.push(`/chat?bookingId=${n.data?.booking_id}`)
               }
             }
           })
@@ -376,9 +384,9 @@ export default function TechnicianDashboard() {
     api.post('/auth/logout').catch((err) => {
       console.error("Background logout failed", err)
     })
-    localStorage.removeItem('token')
-    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;"
-    window.location.href = '/login'
+    localStorage.removeItem("token")
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;"
+    router.push('/login')
   }
 
   const handleAcceptMission = async (id: number) => {
@@ -432,9 +440,7 @@ export default function TechnicianDashboard() {
       await api.post(`/bookings/${activeMission.id}/status`, { status })
       setMissionStatus(status)
       if (status === "completed") {
-        setTimeout(async () => {
-          await fetchDashboardData()
-        }, 1500)
+        await fetchDashboardData()
       }
     } catch (err) {
       console.error("Failed to update status", err)
@@ -625,15 +631,13 @@ export default function TechnicianDashboard() {
                                   {alert.action && (
                                     <Button 
                                        onClick={(e) => {
-                                         e.stopPropagation()
-                                         if (!alert.is_read) {
-                                           handleMarkAsRead(alert.id)
-                                         }
-                                         if (alert.action === 'View' && alert.data?.booking_id) {
-                                           window.location.href = `/chat?bookingId=${alert.data.booking_id}`
-                                         } else if (alert.data?.booking_id) {
-                                           handleAcceptMission(alert.data.booking_id)
-                                         }
+                                          e.stopPropagation()
+                                          if (!alert.is_read) handleMarkAsRead(alert.id)
+                                          if (alert.action === 'View' && alert.data?.booking_id) {
+                                            router.push(`/chat?bookingId=${alert.data.booking_id}`)
+                                          } else if (alert.data?.booking_id) {
+                                            handleAcceptMission(alert.data.booking_id)
+                                          }
                                        }}
                                        size="sm" 
                                        variant={alert.type === "emergency" ? "destructive" : "outline"} 
@@ -704,8 +708,10 @@ export default function TechnicianDashboard() {
                     <Thermometer className="h-5 w-5" />
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-sm font-bold text-foreground">ACTIVE MISSION</h2>
+                    <div className="flex flex-col items-end">
+                    <div className="text-xl font-bold text-foreground">
+                      {formatCurrency(activeMission?.estimated_cost || 1200)}
+                    </div>
                       {activeMission?.is_emergency && (
                         <span className="rounded bg-warning/20 px-1.5 py-0.5 text-[10px] font-bold text-warning">
                           EMERGENCY
@@ -714,13 +720,6 @@ export default function TechnicianDashboard() {
                     </div>
                     <p className="text-[10px] text-muted-foreground font-mono">#{activeMission?.id}</p>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-1 text-lg font-bold text-success">
-                    <DollarSign className="h-4 w-4" />
-                    {activeMission?.estimated_cost || 120}
-                  </div>
-                  <div className="text-[10px] text-muted-foreground">Est. Earnings</div>
                 </div>
               </div>
               ) : (
@@ -844,17 +843,17 @@ export default function TechnicianDashboard() {
                     <span className="text-xs font-semibold text-foreground">Earnings Breakdown</span>
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <div>
-                      <div className="text-sm font-bold text-foreground">${activeMission?.estimated_cost || 120}</div>
-                      <div className="text-[10px] text-muted-foreground">Base</div>
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-muted-foreground">Service Base</div>
+                      <div className="text-sm font-bold text-foreground">{formatCurrency(activeMission?.estimated_cost || 1200)}</div>
                     </div>
-                    <div>
-                      <div className="text-sm font-bold text-foreground">${activeMission?.is_emergency ? 50 : 0}</div>
-                      <div className="text-[10px] text-muted-foreground">Bonus</div>
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-muted-foreground">Emergency Fee</div>
+                      <div className="text-sm font-bold text-foreground">{formatCurrency(activeMission?.is_emergency ? 499 : 0)}</div>
                     </div>
-                    <div className="border-l border-border">
-                      <div className="text-sm font-bold text-success">${(activeMission?.estimated_cost || 120) + (activeMission?.is_emergency ? 50 : 0)}</div>
-                      <div className="text-[10px] text-muted-foreground">Total</div>
+                    <div className="flex items-center justify-between border-t border-border pt-2 mt-2">
+                      <div className="text-sm font-semibold text-foreground">Est. Earnings</div>
+                      <div className="text-sm font-bold text-success">{formatCurrency((activeMission?.estimated_cost || 1200) + (activeMission?.is_emergency ? 499 : 0))}</div>
                     </div>
                   </div>
                 </div>
@@ -905,8 +904,9 @@ export default function TechnicianDashboard() {
                     className="mt-4 rounded-lg bg-success/10 border border-success/30 p-4 text-center"
                   >
                     <CheckCircle className="h-8 w-8 text-success mx-auto mb-2" />
-                    <div className="text-sm font-bold text-success">Mission Complete!</div>
-                    <div className="text-xs text-muted-foreground mt-1">Earned ${activeMission?.estimated_cost || 120}</div>
+                    <div className="mt-8 text-center">
+                    <div className="text-xs text-muted-foreground mt-1">Earned {formatCurrency(activeMission?.estimated_cost || 1200)}</div>
+                  </div>
                   </motion.div>
                 )}
               </div>
@@ -979,11 +979,9 @@ export default function TechnicianDashboard() {
                         </div>
                       </div>
                       
-                      <div className="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-0 border-border/40 pt-2 sm:pt-0">
-                        <div className="text-left sm:text-right">
-                          <div className="text-sm font-bold text-foreground font-mono">{mission?.time_slot || "ASAP"}</div>
-                          <div className="text-xs text-success font-semibold">${mission?.estimated_cost || 120}</div>
-                        </div>
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/50">
+                          <div className="text-xs text-success font-semibold">{formatCurrency(mission?.estimated_cost || 1200)}</div>
+                          <div className="text-xs font-medium text-foreground capitalize">{mission?.status}</div>
                         
                         <div className="flex gap-1.5">
                           <Button
@@ -1031,7 +1029,7 @@ export default function TechnicianDashboard() {
               <div className="p-3 grid grid-cols-2 gap-2">
                 {[
                   { label: "Jobs", value: todayStats.completedJobs, icon: Target, color: "text-primary" },
-                  { label: "Earnings", value: `$${todayStats.totalEarnings}`, icon: DollarSign, color: "text-success" },
+                  { label: "Earnings", value: formatCurrency(todayStats.totalEarnings), icon: IndianRupee, color: "text-success" },
                   { label: "Rating", value: todayStats.avgRating, icon: Star, color: "text-warning" },
                   { label: "Hours", value: todayStats.hoursWorked, icon: Clock, color: "text-accent" },
                 ].map((stat, i) => (
@@ -1053,10 +1051,9 @@ export default function TechnicianDashboard() {
               <div className="mx-3 mb-3 rounded-lg bg-success/10 border border-success/30 p-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-success" />
-                    <span className="text-xs text-foreground">Bonus Earned</span>
+                  <span className="text-sm font-bold text-success">+{formatCurrency(todayStats.bonusEarned)}</span>
+                  <span className="text-xs text-muted-foreground">Today's Bonus</span>
                   </div>
-                  <span className="text-sm font-bold text-success">+${todayStats.bonusEarned}</span>
                 </div>
               </div>
             </motion.div>
@@ -1070,8 +1067,8 @@ export default function TechnicianDashboard() {
             >
               <div className="border-b border-border/50 px-4 py-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-foreground">Weekly Earnings</h3>
-                  <span className="text-xs text-success">$2,342 total</span>
+                  <span className="text-sm font-medium text-foreground">Weekly Target</span>
+                  <span className="text-xs text-success">{formatCurrency(2342)} total</span>
                 </div>
               </div>
 

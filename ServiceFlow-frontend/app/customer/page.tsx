@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import {
@@ -40,6 +41,7 @@ import api from "@/lib/api"
 import { ThemeToggleCompact } from "@/components/theme-toggle"
 import echoInstance from "@/lib/echo"
 import { toast, Toaster } from "sonner"
+import { formatCurrency } from "@/lib/utils"
 
 interface Booking {
   id: string
@@ -238,6 +240,7 @@ const mockDashboardData: DashboardData = {
 }
 
 export default function CustomerDashboard() {
+  const router = useRouter()
   const [data, setData] = useState<DashboardData>(mockDashboardData)
   const [isLoading, setIsLoading] = useState(true)
   const [reviewModalOpen, setReviewModalOpen] = useState(false)
@@ -277,7 +280,7 @@ export default function CustomerDashboard() {
     }
   }
 
-  const handleMarkAsRead = async (notifId: number | string) => {
+  const handleMarkAsRead = useCallback(async (notifId: number | string) => {
     try {
       await api.patch(`/notifications/${notifId}/read`)
       setData(prev => {
@@ -297,13 +300,12 @@ export default function CustomerDashboard() {
           notifications: updatedNotifs
         }
       })
-      setTimeout(fetchDashboardData, 300)
     } catch (err) {
       console.error("Failed to mark notification as read:", err)
     }
-  }
+  }, [])
 
-  const handleMarkAllRead = async () => {
+  const handleMarkAllRead = useCallback(async () => {
     try {
       await api.post('/notifications/read-all')
       setData(prev => {
@@ -317,14 +319,13 @@ export default function CustomerDashboard() {
           notifications: updatedNotifs
         }
       })
-      setTimeout(fetchDashboardData, 300)
       toast.success("All notifications marked as read")
     } catch (err) {
       console.error("Failed to mark all notifications as read:", err)
     }
-  }
+  }, [])
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       const response = await api.get("/auth/me")
       if (response.data?.user) {
@@ -332,9 +333,9 @@ export default function CustomerDashboard() {
         if (currentUser.role !== 'customer') {
           // Role mismatch - redirect
           if (currentUser.role === 'technician') {
-            window.location.href = '/technician'
+            router.push('/technician')
           } else if (currentUser.role === 'admin') {
-            window.location.href = '/admin'
+            router.push('/admin')
           }
           return
         }
@@ -342,15 +343,15 @@ export default function CustomerDashboard() {
       } else {
         localStorage.removeItem('token')
         document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;"
-        window.location.href = "/login?redirect=/customer&message=first%20u%20have%20to%20login"
+        router.push("/login?redirect=/customer&message=first%20u%20have%20to%20login")
       }
     } catch (error) {
       console.error("Failed to fetch logged-in user profile", error)
       localStorage.removeItem('token')
       document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;"
-      window.location.href = "/login?redirect=/customer&message=first%20u%20have%20to%20login"
+      router.push("/login?redirect=/customer&message=first%20u%20have%20to%20login")
     }
-  }
+  }, [router])
 
   useEffect(() => {
     fetchDashboardData()
@@ -395,7 +396,7 @@ export default function CustomerDashboard() {
             action: {
               label: "View",
               onClick: () => {
-                window.location.href = `/chat?bookingId=${n.data?.booking_id}`
+                router.push(`/chat?bookingId=${n.data?.booking_id}`)
               }
             }
           })
@@ -427,7 +428,7 @@ export default function CustomerDashboard() {
     })
     localStorage.removeItem("token")
     document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;"
-    window.location.href = "/login"
+    router.push("/login")
   }
 
   const openReviewModal = (booking: Booking) => {
@@ -644,7 +645,7 @@ export default function CustomerDashboard() {
                                         if (!notif.is_read) {
                                           handleMarkAsRead(notif.id);
                                         }
-                                        window.location.href = `/chat?bookingId=${notif.data?.booking_id}`;
+                                        router.push(`/chat?bookingId=${notif.data?.booking_id}`);
                                       }}
                                       size="sm"
                                       className="h-5 px-2 text-[9px] rounded-lg bg-primary hover:bg-primary/95 text-primary-foreground font-medium"
@@ -821,7 +822,7 @@ export default function CustomerDashboard() {
                       </div>
                       <div className="mt-4">
                         <span className="text-3xl font-extrabold text-foreground">
-                          ${data.active_booking.estimated_cost}
+                          ₹{data.active_booking.estimated_cost}
                         </span>
                         <p className="text-[10px] text-muted-foreground mt-1">
                           Base pricing, verified on-site by technician
@@ -973,7 +974,7 @@ export default function CustomerDashboard() {
                       <div className="flex items-center justify-between md:justify-end gap-4 border-t md:border-t-0 border-border/30 pt-3 md:pt-0">
                         <div className="text-left md:text-right shrink-0">
                           <div className={cn("text-sm font-bold text-foreground", booking.status === 'cancelled' && "line-through text-muted-foreground")}>
-                            ${booking.estimated_cost}
+                            ₹{booking.estimated_cost}
                           </div>
                           <span className={cn("text-[10px] font-semibold flex items-center gap-0.5", booking.status === 'cancelled' ? "text-destructive" : "text-emerald-400")}>
                             {booking.status === 'cancelled' ? "Cancelled" : "Paid successfully"}
@@ -1124,7 +1125,7 @@ export default function CustomerDashboard() {
                                 if (!notif.is_read) {
                                   handleMarkAsRead(notif.id);
                                 }
-                                window.location.href = `/chat?bookingId=${notif.data?.booking_id}`;
+                                router.push(`/chat?bookingId=${notif.data?.booking_id}`);
                               }}
                               size="sm"
                               className="h-5 px-2 text-[9px] rounded-lg bg-primary hover:bg-primary/95 text-primary-foreground font-medium"

@@ -40,16 +40,20 @@ class CustomerController extends Controller
             ->where('is_read', false)
             ->count();
 
+        $stats = Booking::where('customer_id', $customerId)
+            ->selectRaw('count(*) as total_bookings')
+            ->selectRaw('sum(case when status = ? then 1 else 0 end) as completed', [BookingStatus::Completed->value])
+            ->selectRaw('sum(case when status not in (?, ?) then 1 else 0 end) as active', [BookingStatus::Completed->value, BookingStatus::Cancelled->value])
+            ->first();
+
         return response()->json([
             'active_booking' => $active ? new BookingResource($active) : null,
             'upcoming' => BookingResource::collection($upcoming),
             'recent' => BookingResource::collection($recent),
             'stats' => [
-                'total_bookings' => Booking::where('customer_id', $customerId)->count(),
-                'completed' => Booking::where('customer_id', $customerId)->where('status', BookingStatus::Completed)->count(),
-                'active' => Booking::where('customer_id', $customerId)
-                    ->whereNotIn('status', [BookingStatus::Completed, BookingStatus::Cancelled])
-                    ->count(),
+                'total_bookings' => (int) ($stats->total_bookings ?? 0),
+                'completed' => (int) ($stats->completed ?? 0),
+                'active' => (int) ($stats->active ?? 0),
                 'unread_notifications' => $unread,
             ],
             'notifications' => NotificationResource::collection(

@@ -24,7 +24,7 @@ const tiers = [
   },
   {
     name: "Pro Plan",
-    price: "$9.99",
+    price: "₹299",
     period: "/mo",
     description: "Ideal for homeowners needing reliable, faster service.",
     features: [
@@ -42,7 +42,7 @@ const tiers = [
   },
   {
     name: "VIP Advanced",
-    price: "$19.99",
+    price: "₹999",
     period: "/mo",
     description: "For complete peace of mind and emergency support.",
     features: [

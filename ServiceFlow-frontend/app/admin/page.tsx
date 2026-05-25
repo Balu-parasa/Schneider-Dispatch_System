@@ -44,6 +44,8 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react"
+import { toast, Toaster } from "sonner"
+import { formatCurrency } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { ThemeToggleCompact } from "@/components/theme-toggle"
@@ -63,6 +65,7 @@ const generateRealtimeData = () => ({
   wsConnections: 2847 + Math.floor(Math.random() * 100),
   completionRate: 94 + Math.floor(Math.random() * 4),
   utilization: 78 + Math.floor(Math.random() * 10),
+  totalTechs: 150,
 })
 
 const dispatchFeed = [
@@ -287,8 +290,8 @@ export default function AdminDashboard() {
           {[
             { label: "Active Techs", value: stats.activeTechnicians, icon: Users, color: "text-blue-400" },
             { label: "Live Jobs", value: stats.activeJobs, icon: Activity, color: "text-cyan-400" },
-            { label: "Completed", value: stats.completedToday, icon: CheckCircle, color: "text-emerald-400" },
-            { label: "Revenue", value: `$${(stats.revenue/1000).toFixed(1)}K`, icon: DollarSign, color: "text-emerald-400" },
+            { label: "Total Techs", value: stats.totalTechs.toString(), icon: Users, color: "text-blue-400" },
+            { label: "Revenue", value: formatCurrency(stats.revenue), icon: DollarSign, color: "text-emerald-400" },
             { label: "Avg Response", value: `${stats.avgResponseTime}m`, icon: Clock, color: "text-amber-400" },
             { label: "Queue", value: stats.queueSize, icon: Layers, color: "text-amber-400" },
             { label: "Emergencies", value: stats.emergencies, icon: AlertTriangle, color: "text-red-400" },
