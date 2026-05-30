@@ -181,16 +181,7 @@ export default function AdminDashboard() {
     return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
   }, [])
 
-  if (isAuthLoading) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center bg-background text-foreground">
-        <div className="text-center">
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent animate-glow" />
-          <p className="mt-4 text-sm text-muted-foreground animate-pulse">Syncing admin command center...</p>
-        </div>
-      </div>
-    )
-  }
+
 
   return (
     <div className="h-screen bg-background text-foreground overflow-hidden flex">

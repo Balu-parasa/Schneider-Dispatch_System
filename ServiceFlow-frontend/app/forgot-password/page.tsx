@@ -124,10 +124,8 @@ export default function ForgotPasswordPage() {
       setTimer(60) // Start 60s cooldown
       
       // Auto advance to step 2 after a brief delay
-      setTimeout(() => {
-        setStep(2)
-        setSuccessMessage("")
-      }, 1500)
+      setStep(2)
+      setIsLoading(false)
     } catch (err: any) {
       console.error(err)
       if (err.code === "ERR_NETWORK" || !err.response) {

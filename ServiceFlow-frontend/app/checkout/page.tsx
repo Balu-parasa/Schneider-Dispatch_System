@@ -53,19 +53,14 @@ function CheckoutContent() {
     e.preventDefault()
     setPaymentStatus('processing')
     
-    // Simulate real-time secure handshake and processing
+    setPaymentStatus('success')
     setTimeout(() => {
-      setPaymentStatus('success')
-      
-      // Redirect after showing the beautiful success animation
-      setTimeout(() => {
-        if (bookingId) {
-          router.push(`/tracking?booking_id=${bookingId}&payment=success`)
-        } else {
-          router.push("/?subscription=success")
-        }
-      }, 3500)
-    }, 800)
+      if (bookingId) {
+        router.push(`/tracking?booking_id=${bookingId}&payment=success`)
+      } else {
+        router.push("/?subscription=success")
+      }
+    }, 1500)
   }
 
   return (
